@@ -1,0 +1,17 @@
+[
+	{
+		"id": "1",
+		"link": "https://images.unsplash.com/photo-1543007168-5fa9b3c5f5fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8b2N0b3B1c3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
+		"name": "Медуз1"
+	},
+	{
+		"id": "2",
+		"link": "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/baikal.jpg",
+		"name": "Медуз2"
+	},
+	{
+		"id": "3",
+		"link": "https://mirpozitiva.ru/wp-content/uploads/2019/11/1472042485_04-1568x882.jpg",
+		"name": "Медуз3"
+	}
+]
