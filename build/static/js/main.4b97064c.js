@@ -10943,7 +10943,7 @@
 									return this._request(
 										"".concat(
 											this._url,
-											"users/648f4eceac33ebb800e0acee"
+											"users/me"
 										),
 										{ headers: this._headers }
 									);
@@ -10962,7 +10962,7 @@
 								key: "patchUserInfo",
 								value: function (e) {
 									return this._request(
-										"".concat(this._url, "users/648f4eceac33ebb800e0acee"),
+										"".concat(this._url, "users/me"),
 										{
 											method: "PATCH",
 											headers: this._headers,

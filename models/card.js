@@ -26,6 +26,7 @@ const cardSchema = new mongoose.Schema([
 				ref: "user",
 				required: true,
 			},
+			{ _id: { type: String } },
 		],
 	},
 ]);

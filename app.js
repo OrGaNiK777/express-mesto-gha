@@ -34,7 +34,6 @@ app.use((req, res, next) => {
 	req.user = {
 		_id: "648f4eceac33ebb800e0acee", // вставьте сюда _id созданного в предыдущем пункте пользователя
 	};
-	console.log(req.user._id);
 	next();
 });
 
@@ -50,16 +49,15 @@ app.get("/users", (req, res) => {
 });
 
 app.get("/users/:id", (req, res) => {
-	const { id } = req.params;
-	console.log(id);
-	return user.findById(id).then((user) => {
+	//const { id } = req.params;
+	return user.findById(req.user._id).then((user) => {
 		return res.status(200).send(user);
 	});
 });
 
 app.post("/users", (req, res) => {
 	const newUser = req.body;
-	console.log(newUser);
+	//console.log(newUser);
 	return user
 		.create(newUser)
 		.then((newUser) => {
@@ -90,10 +88,8 @@ app.get("/cards", (req, res) => {
 app.post("/cards", (req, res) => {
 	const newCard = req.body;
 	const { name, link } = req.body;
-	const owner = req.user;
-	console.log({ name, link, owner});
 	return card
-		.create({ name, link })
+		.create({ name, link, owner: req.user._id })
 		.then((newCard) => {
 			return res.status(201).send(newCard);
 		})
@@ -111,7 +107,7 @@ app.post("/cards", (req, res) => {
 
 app.delete("/cards/:id", (req, res) => {
 	const { id } = req.params;
-	console.log(id);
+	//console.log(id);
 	return card.findOneAndDelete(id).then((card) => {
 		return res.status(200).send(card);
 	});
@@ -119,7 +115,7 @@ app.delete("/cards/:id", (req, res) => {
 
 app.put("/cards/:id/likes", (req, res) => {
 	const { id } = req.params;
-	console.log(id);
+	//console.log(id);
 	card.findByIdAndUpdate(
 		id,
 		{ $addToSet: { likes: req.user._id } },
@@ -131,7 +127,7 @@ app.put("/cards/:id/likes", (req, res) => {
 
 app.delete("/cards/:id/likes", (req, res) => {
 	const { id } = req.params;
-	console.log(id);
+	//console.log(id);
 	card.findByIdAndUpdate(
 		id,
 		{ $pull: { likes: req.user._id } },
