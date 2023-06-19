@@ -10943,7 +10943,7 @@
 									return this._request(
 										"".concat(
 											this._url,
-											"users/me"
+											"/users/me"
 										),
 										{ headers: this._headers }
 									);
@@ -10953,7 +10953,7 @@
 								key: "getInitialCards",
 								value: function () {
 									return this._request(
-										"".concat(this._url, "cards"),
+										"".concat(this._url, "/cards"),
 										{ headers: this._headers }
 									);
 								},
@@ -10962,7 +10962,7 @@
 								key: "patchUserInfo",
 								value: function (e) {
 									return this._request(
-										"".concat(this._url, "users/me"),
+										"".concat(this._url, "/users/me"),
 										{
 											method: "PATCH",
 											headers: this._headers,
@@ -10978,7 +10978,7 @@
 								key: "postDataCards",
 								value: function (e) {
 									return this._request(
-										"".concat(this._url, "cards/"),
+										"".concat(this._url, "/cards/"),
 										{
 											method: "post",
 											headers: this._headers,
@@ -11036,7 +11036,7 @@
 								key: "updateAvatar",
 								value: function (e) {
 									return this._request(
-										"".concat(this._url, "users/me/avatar"),
+										"".concat(this._url, "/users/me/avatar"),
 										{
 											method: "PATCH",
 											headers: this._headers,
@@ -11049,7 +11049,7 @@
 						e
 					);
 				})())({
-					url: "http://localhost:5000/",
+					url: "http://localhost:5000",
 					headers: { "Content-Type": "application/json" },
 				}),
 				k = (0, e.createContext)();
