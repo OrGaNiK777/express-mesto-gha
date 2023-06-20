@@ -7,14 +7,14 @@ const getUsersById = (req, res) => {
   User.findById(id).then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({
-          message: 'Переданы некорректные данные',
+        return res.status(404).send({
+          message: `Пользователь c id: ${id} не найден`,
         });
       }
       if (err.message === 'NotValidId') {
         return res
-          .status(404)
-          .send(`Пользователь c id: ${id} не найден`);
+          .status(400)
+          .send({ message: 'Переданы некорректные данные' });
       } return res.status(500).send(`${err.name}`);
     });
 };
