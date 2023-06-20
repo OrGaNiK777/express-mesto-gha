@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const cardSchema = new mongoose.Schema([
   {
@@ -36,32 +36,4 @@ const cardSchema = new mongoose.Schema([
   },
 ]);
 
-module.exports = mongoose.model("card", cardSchema);
-
-//const mongoose = require("mongoose");
-
-// const cardSchema = new mongoose.Schema({
-// 	createdAt: {
-// 		type: String,
-// 	},
-// 	likes: {
-// 		type: Array,
-// 	},
-// 	link: {
-// 		type: String,
-// 		required: true,
-// 	},
-// 	name: {
-// 		minlength: 2,
-// 		maxlength: 30,
-// 		type: String,
-// 		required: true,
-// 	},
-// 	owner: {
-// 		type: mongoose.Schema.Types.ObjectId,
-// 		ref: "user",
-// 		required: true,
-// 	},
-// });
-
-// module.exports = mongoose.model("card", cardSchema);
+module.exports = mongoose.model('card', cardSchema);

@@ -1,13 +1,9 @@
-const User = require("../models/user");
+const User = require('../models/user');
 
-const getUsers = (req, res) => {
-  return User.find({}).then((user) => {
-    return res.status(200).send(user);
-  });
-};
+const getUsers = (req, res) => User.find({}).then((user) => res.status(200).send(user));
 
 const getUsersById = (req, res) => {
-  //const { id } = req.params;
+  // const { id } = req.params;
   User.findById(req.user._id)
     .then((user) => {
       if (!req.user._id) {
@@ -24,25 +20,17 @@ const getUsersById = (req, res) => {
 
 const createUser = (req, res) => {
   const newUser = req.body;
-  //console.log(newUser);
+  // console.log(newUser);
   return User.create(newUser)
-    .then((newUser) => {
-      return res.status(201).send(newUser);
-    })
+    .then((user) => res.status(201).send(user))
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         return res.status(400).send({
           Message: `${Object.values(err.errors)
-            .map((err) => err.message)
-            .join(", ")}`,
+            .map((err1) => err1.message)
+            .join(', ')}`,
         });
       }
-      // if (err.name === "CastError") {
-      // 	return res.status(400).send({
-      // 		message:
-      // 			"Переданы некорректные данные создания пользователя",
-      // 	});
-      // }
       return res.status(500).send(`${err.name}`);
     });
 };
@@ -54,20 +42,20 @@ const patchUserById = (req, res) => {
     new: true,
     runValidators: true,
   })
-    .then((newUser) => {
+    .then((user) => {
       if (!req.user._id) {
         return res
           .status(404)
           .send(`Пользователь по id  ${req.user._id} не найден`);
       }
-      return res.status(200).send(newUser);
+      return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         return res.status(400).send({
           Message: `${Object.values(err.errors)
-            .map((err) => err.message)
-            .join(", ")}`,
+            .map((err1) => err1.message)
+            .join(', ')}`,
         });
       }
       return res.status(500).send(`${err.name}`);
@@ -81,28 +69,22 @@ const patchAvatarById = (req, res) => {
     new: true,
     runValidators: true,
   })
-    .then((newUser) => {
+    .then((user) => {
       if (!req.user._id) {
         return res
           .status(404)
           .send(`Пользователь по id  ${req.user._id} не найден`);
       }
-      return res.status(200).send(newUser);
+      return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         return res.status(400).send({
           Message: `${Object.values(err.errors)
-            .map((err) => err.message)
-            .join(", ")}`,
+            .map((err1) => err1.message)
+            .join(', ')}`,
         });
       }
-      // if (err.name === "CastError") {
-      // 	return res.status(400).send({
-      // 		message:
-      // 			"Переданы некорректные данные при обновлении аватара",
-      // 	});
-      // }
       return res.status(500).send(`${err.name}`);
     });
 };
