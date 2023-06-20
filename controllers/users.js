@@ -1,22 +1,15 @@
 const User = require('../models/user');
 
-const getUsers = (req, res) => User.find({}).then((user) => {
-  if (!req.user._id) {
-    return res
-      .status(404)
-      .send(`Пользователь по id  ${req.user._id} не найден`);
-  }
-  return res.status(200).send(user);
-});
+const getUsers = (req, res) => User.find({}).then((user) => res.status(200).send(user));
 
 const getUsersById = (req, res) => {
-  // const { id } = req.params;
-  User.findById(req.user._id)
+  const { id } = req.params;
+  User.findById(id)
     .then((user) => {
-      if (!req.user._id) {
+      if (!id) {
         return res
           .status(404)
-          .send(`Пользователь по id  ${req.user._id} не найден`);
+          .send(`Пользователь по id  ${id} не найден`);
       }
       return res.status(200).send(user);
     })
