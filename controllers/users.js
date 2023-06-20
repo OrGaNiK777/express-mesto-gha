@@ -1,6 +1,13 @@
 const User = require('../models/user');
 
-const getUsers = (req, res) => User.find({}).then((user) => res.status(200).send(user));
+const getUsers = (req, res) => User.find({}).then((user) => {
+  if (!req.user._id) {
+    return res
+      .status(404)
+      .send(`Пользователь по id  ${req.user._id} не найден`);
+  }
+  return res.status(200).send(user);
+});
 
 const getUsersById = (req, res) => {
   // const { id } = req.params;
@@ -24,11 +31,9 @@ const createUser = (req, res) => {
   return User.create(newUser)
     .then((user) => res.status(201).send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         return res.status(400).send({
-          Message: `${Object.values(err.errors)
-            .map((err1) => err1.message)
-            .join(', ')}`,
+          message: 'Переданы некорректные данные при создании пользователя',
         });
       }
       return res.status(500).send(`${err.name}`);
@@ -51,11 +56,9 @@ const patchUserById = (req, res) => {
       return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         return res.status(400).send({
-          Message: `${Object.values(err.errors)
-            .map((err1) => err1.message)
-            .join(', ')}`,
+          message: 'Переданы некорректные данные при создании пользователя',
         });
       }
       return res.status(500).send(`${err.name}`);
@@ -78,11 +81,9 @@ const patchAvatarById = (req, res) => {
       return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         return res.status(400).send({
-          Message: `${Object.values(err.errors)
-            .map((err1) => err1.message)
-            .join(', ')}`,
+          message: 'Переданы некорректные данные при обновлении аватара',
         });
       }
       return res.status(500).send(`${err.name}`);
