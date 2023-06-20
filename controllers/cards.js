@@ -42,14 +42,14 @@ const putLikesCardById = (req, res) => {
     .then((card) => {
       if (!card) {
         return res.status(404).send({
-          Message: `Карточка с указаным id ${id} не найдена`,
+          Message: 'Карточка с указаным id не найдена',
         });
       } return res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(400).send({
-          message: 'Переданы некорректные данные для постановки лайка',
+          Message: 'Переданы некорректные данные для постановки лайка',
         });
       }
       return res.status(500).send(`${err.name}`);
@@ -66,14 +66,14 @@ const deleteLikesCardById = (req, res) => {
     .then((card) => {
       if (!card) {
         return res.status(404).send({
-          Message: `Карточка с указаным id ${id} не найдена`,
+          Message: 'Карточка с указаным id не найдена',
         });
       } return res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(400).send({
-          message: 'Переданы некорректные данные для удаления лайка',
+          Message: 'Переданы некорректные данные для удаления лайка',
         });
       }
       return res.status(500).send(`${err.name}`);
