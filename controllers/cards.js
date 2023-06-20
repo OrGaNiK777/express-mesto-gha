@@ -22,7 +22,6 @@ const deleteCardById = (req, res) => {
   const { id } = req.params;
   Card.findByIdAndRemove(id, { new: true })
     .then((card) => res.status(200).send(card))
-
     .catch((err) => {
       if (err.message === 'NotFoundById') {
         return res.status(404).send({
@@ -42,14 +41,14 @@ const putLikesCardById = (req, res) => {
   )
     .then((cards) => { res.status(200).send(cards); })
     .catch((err) => {
-      if (err.name === 'NotFoundById') {
+      if (err.name === 'CastError') {
         return res.status(400).send({
           message: 'Переданы некорректные данные для удаления лайка',
         });
       }
-      if (err.name === 'CastError') {
+      if (err.name === 'NotFoundById') {
         return res.status(404).send({
-          Message: `Карточка с указаным id ${req.user._id} не найдена`
+          Message: `Карточка с указаным id ${id} не найдена`
           ,
         });
       }
@@ -65,16 +64,15 @@ const deleteLikesCardById = (req, res) => {
     { new: true },
   )
     .then((card) => res.status(200).send(card))
-
     .catch((err) => {
-      if (err.name === 'NotFoundById') {
+      if (err.name === 'CastError') {
         return res.status(400).send({
           message: 'Переданы некорректные данные для удаления лайка',
         });
       }
-      if (err.name === 'CastError') {
+      if (err.name === 'NotFoundById') {
         return res.status(404).send({
-          Message: `Карточка с указаным id ${req.user._id} не найдена`
+          Message: `Карточка с указаным id ${id} не найдена`
           ,
         });
       }
