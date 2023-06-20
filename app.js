@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const routes = require('./routes/index');
 
@@ -17,10 +16,11 @@ mongoose
     family: 4,
   })
   .then(() => {
+    // eslint-disable-next-line no-console
     console.log('Connected to DB');
   });
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.use((req, res, next) => {
   req.user = {
@@ -32,5 +32,6 @@ app.use((req, res, next) => {
 app.use(routes);
 
 app.listen(PORT, host, () => {
+  // eslint-disable-next-line no-console
   console.log(`Cервер запущен на http://${host}:${PORT}/`);
 });
