@@ -6,15 +6,17 @@ const getUsersById = (req, res) => {
   const { id } = req.params;
   User.findById(id).then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(404).send({
-          message: `Пользователь c id: ${id} не найден`,
+      if (id === 'text') {
+        return res.status(400).send({
+          message: 'Переданы некорректные данные',
         });
       }
-      if (err.message === 'NotValidId') {
+      if (err.message === 'CastError') {
         return res
-          .status(400)
-          .send({ message: 'Переданы некорректные данные' });
+          .status(404)
+          .send({
+            message: `Пользователь c id: ${id} не найден`,
+          });
       } return res.status(500).send(`${err.name}`);
     });
 };
