@@ -1,7 +1,7 @@
-const card = require("../models/card");
+const Card = require("../models/card");
 
 const getCards = (req, res) => {
-	return card.find({}).then((cards) => {
+	return Card.find({}).then((cards) => {
 		return res.status(200).send(cards);
 	});
 };
@@ -10,8 +10,8 @@ const createCard = (req, res) => {
 	//const newCard = req.body;
 	const { name, link } = req.body;
 	const owner = req.user;
-	return card
-		.create({ name, link, owner })
+	console.log({ name, link });
+	return Card.create({ name, link, owner })
 		.then((newCard) => {
 			return res.status(201).send(newCard);
 		})
@@ -23,18 +23,13 @@ const createCard = (req, res) => {
 						.join(", ")}`,
 				});
 			}
-			// if (err.name === "CastError") {
-			// 	return res.status(400).send({
-			// 		message: "Переданы некорректные данные создания карточки",
-			// 	});
-			// }
 			return res.status(500).send(`${err.name}`);
 		});
 };
 
 const deleteCardById = (req, res) => {
 	const { id } = req.params;
-	card.findByIdAndRemove(id, { new: true })
+	Card.findByIdAndRemove(id, { new: true })
 		.then((card) => {
 			return res.status(200).send(card);
 		})
@@ -51,13 +46,14 @@ const deleteCardById = (req, res) => {
 
 const putLikesCardById = (req, res) => {
 	const { id } = req.params;
-	card.findByIdAndUpdate(
+	console.log("установка лайка");
+	Card.findByIdAndUpdate(
 		id,
-		{ $addToSet: { likes: req.user._id } },
+		{ $addToSet: { likes: { _id: req.user._id } } }, // добавить _id в массив, если его там нет
 		{ new: true }
 	)
-		.then((card) => {
-			return res.status(200).send(card);
+		.then((cards) => {
+			return res.status(200).send(cards);
 		})
 		.catch((err) => {
 			if (err.name === "CastError") {
@@ -76,10 +72,10 @@ const putLikesCardById = (req, res) => {
 
 const deleteLikesCardById = (req, res) => {
 	const { id } = req.params;
-	console.log(req.user._id);
-	card.findByIdAndUpdate(
+	console.log("удаление лайка");
+	Card.findByIdAndUpdate(
 		id,
-		{ $pull: { likes: req.user._id } },
+		{ $pull: { likes: { _id: req.user._id } } }, // убрать _id из массива
 		{ new: true }
 	)
 		.then((card) => {

@@ -1,14 +1,14 @@
-const user = require("../models/user");
+const User = require("../models/user");
 
 const getUsers = (req, res) => {
-	return user.find({}).then((user) => {
+	return User.find({}).then((user) => {
 		return res.status(200).send(user);
 	});
 };
 
 const getUsersById = (req, res) => {
 	//const { id } = req.params;
-	user.findById(req.user._id)
+	User.findById(req.user._id)
 		.then((user) => {
 			if (!req.user._id) {
 				return res
@@ -25,8 +25,7 @@ const getUsersById = (req, res) => {
 const createUser = (req, res) => {
 	const newUser = req.body;
 	//console.log(newUser);
-	return user
-		.create(newUser)
+	return User.create(newUser)
 		.then((newUser) => {
 			return res.status(201).send(newUser);
 		})
@@ -51,8 +50,10 @@ const createUser = (req, res) => {
 const patchUserById = (req, res) => {
 	const newUser = req.body;
 	const id = req.user._id;
-	return user
-		.findByIdAndUpdate(id, newUser, { new: true, runValidators: true })
+	return User.findByIdAndUpdate(id, newUser, {
+		new: true,
+		runValidators: true,
+	})
 		.then((newUser) => {
 			if (!req.user._id) {
 				return res
@@ -76,8 +77,10 @@ const patchUserById = (req, res) => {
 const patchAvatarById = (req, res) => {
 	const newUser = req.body;
 	const id = req.user._id;
-	return user
-		.findByIdAndUpdate(id, newUser, { new: true, runValidators: true })
+	return User.findByIdAndUpdate(id, newUser, {
+		new: true,
+		runValidators: true,
+	})
 		.then((newUser) => {
 			if (!req.user._id) {
 				return res
