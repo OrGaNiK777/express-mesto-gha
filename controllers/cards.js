@@ -39,17 +39,17 @@ const putLikesCardById = (req, res) => {
     { $addToSet: { likes: { _id: req.user._id } } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-    .then((cards) => { res.status(200).send(cards); })
+    .then((card) => {
+      if (!card) {
+        return res.status(404).send({
+          Message: `Карточка с указаным id ${id} не найдена`,
+        });
+      } return res.status(200).send(card);
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(400).send({
-          message: 'Переданы некорректные данные для удаления лайка',
-        });
-      }
-      if (err.name === 'NotFoundById') {
-        return res.status(404).send({
-          Message: `Карточка с указаным id ${id} не найдена`
-          ,
+          message: 'Переданы некорректные данные для постановки лайка',
         });
       }
       return res.status(500).send(`${err.name}`);
@@ -63,17 +63,17 @@ const deleteLikesCardById = (req, res) => {
     { $pull: { likes: { _id: req.user._id } } }, // убрать _id из массива
     { new: true },
   )
-    .then((card) => res.status(200).send(card))
+    .then((card) => {
+      if (!card) {
+        return res.status(404).send({
+          Message: `Карточка с указаным id ${id} не найдена`,
+        });
+      } return res.status(200).send(card);
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(400).send({
           message: 'Переданы некорректные данные для удаления лайка',
-        });
-      }
-      if (err.name === 'NotFoundById') {
-        return res.status(404).send({
-          Message: `Карточка с указаным id ${id} не найдена`
-          ,
         });
       }
       return res.status(500).send(`${err.name}`);
