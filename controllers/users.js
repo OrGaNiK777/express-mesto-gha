@@ -4,29 +4,32 @@ const getUsers = (req, res) => User.find({}).then((user) => res.status(200).send
 
 const getUsersById = (req, res) => {
   const { id } = req.params;
-  User.findById(id)
-    .then((user) => {
-      if (!id) {
-        return res
-          .status(404)
-          .send(`Пользователь по id  ${id} не найден`);
-      }
-      return res.status(200).send(user);
-    })
+  User.findById(id).then((user) => {
+    if (!req.user._id) {
+      return res
+        .status(404)
+        .send(`Пользователь c id: ${req.user._id} не найден`);
+    }
+    return res.status(200).send(user);
+  })
     .catch((err) => {
-      res.status(500).send(`${err.name}`);
+      if (id.length < '20') {
+        return res.status(400).send({
+          message: 'Переданы некорректные данные',
+        });
+      }
+      return res.status(500).send(`${err.name}`);
     });
 };
 
 const createUser = (req, res) => {
   const newUser = req.body;
-  // console.log(newUser);
   return User.create(newUser)
     .then((user) => res.status(201).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({
-          message: 'Переданы некорректные данные при создании пользователя',
+          message: `${Object.values(err.errors).map((error) => error.message).join(' and ')}`,
         });
       }
       return res.status(500).send(`${err.name}`);
@@ -51,7 +54,12 @@ const patchUserById = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({
-          message: 'Переданы некорректные данные при создании пользователя',
+          message: `${Object.values(err.errors).map((error) => error.message).join(' and ')}`,
+        });
+      }
+      if (err.name === 'CastError') {
+        return res.status(400).send({
+          message: 'Переданы некорректные данные при обновлении аватара',
         });
       }
       return res.status(500).send(`${err.name}`);

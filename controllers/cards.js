@@ -9,9 +9,9 @@ const createCard = (req, res) => {
   return Card.create({ name, link, owner })
     .then((newCard) => res.status(201).send(newCard))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         return res.status(400).send({
-          message: 'Переданы некорректные данные для создания карточки',
+          message: `${Object.values(err.errors).map((error) => error.message).join(' and ')}`,
         });
       }
       return res.status(500).send(`${err.name}`);
@@ -40,16 +40,17 @@ const putLikesCardById = (req, res) => {
     { $addToSet: { likes: { _id: req.user._id } } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-    .then((cards) => res.status(200).send(cards))
+    .then((cards) => { res.status(200).send(cards); })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'NotFoundById') {
         return res.status(400).send({
-          message: 'Переданы некорректные данные для постановки лайка',
+          message: 'Переданы некорректные данные для удаления лайка',
         });
       }
-      if (err.message === 'NotFoundById') {
+      if (err.name === 'CastError') {
         return res.status(404).send({
-          Message: `Карточка с указаным id  ${id} не найдена`,
+          Message: `Карточка с указаным id ${req.user._id} не найдена`
+          ,
         });
       }
       return res.status(500).send(`${err.name}`);
@@ -64,15 +65,17 @@ const deleteLikesCardById = (req, res) => {
     { new: true },
   )
     .then((card) => res.status(200).send(card))
+
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'NotFoundById') {
         return res.status(400).send({
           message: 'Переданы некорректные данные для удаления лайка',
         });
       }
-      if (err.message === 'NotFoundById') {
+      if (err.name === 'CastError') {
         return res.status(404).send({
-          Message: `Карточка с указаным id  ${id} не найдена`,
+          Message: `Карточка с указаным id ${req.user._id} не найдена`
+          ,
         });
       }
       return res.status(500).send(`${err.name}`);
