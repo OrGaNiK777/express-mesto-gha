@@ -4,21 +4,18 @@ const getUsers = (req, res) => User.find({}).then((user) => res.status(200).send
 
 const getUsersById = (req, res) => {
   const { id } = req.params;
-  User.findById(id).then((user) => {
-    if (!req.user._id) {
-      return res
-        .status(404)
-        .send(`Пользователь c id: ${req.user._id} не найден`);
-    }
-    return res.status(200).send(user);
-  })
+  User.findById(id).then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (id.length < '20') {
+      if (err.name === 'CastError') {
         return res.status(400).send({
           message: 'Переданы некорректные данные',
         });
       }
-      return res.status(500).send(`${err.name}`);
+      if (err.message === 'NotValidId') {
+        return res
+          .status(404)
+          .send(`Пользователь c id: ${id} не найден`);
+      } return res.status(500).send(`${err.name}`);
     });
 };
 
