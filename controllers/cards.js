@@ -36,7 +36,7 @@ const deleteCardById = (req, res) => {
       }
       return res.status(500).send(`${err.name}`);
     });
-}
+};
 const putLikesCardById = (req, res) => {
   const { id } = req.params;
   Card.findByIdAndUpdate(

@@ -2,9 +2,9 @@ const router = require('express').Router();
 const cardsRoutes = require('./cards');
 const usersRoutes = require('./users');
 
-router.get('/', (req, res) => {
-  res.status(200);
-  res.send('hello');
+router.get('/404', (req, res) => {
+  res.status(404);
+  res.send('Воу воу полегче');
 });
 
 router.use(cardsRoutes);
