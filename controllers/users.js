@@ -31,7 +31,7 @@ const createUser = (req, res) => {
   return User.create(newUser)
     .then((user) => res.status(201).send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         return res.status(400).send({
           message: 'Переданы некорректные данные при создании пользователя',
         });
@@ -56,7 +56,7 @@ const patchUserById = (req, res) => {
       return res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         return res.status(400).send({
           message: 'Переданы некорректные данные при создании пользователя',
         });

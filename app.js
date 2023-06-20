@@ -5,7 +5,7 @@ const routes = require('./routes/index');
 
 const host = 'localhost';
 
-const { PORT = 3000 } = process.env;
+const { PORT = 5000 } = process.env;
 
 const app = express();
 
