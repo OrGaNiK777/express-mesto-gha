@@ -4,7 +4,7 @@ const BadRequestError = require('../errors/bad-request-error');// 400
 
 const getUsers = (req, res) => User.find({}).then((user) => res.status(200).send(user));
 
-const getUsersById = (req, res, next) => {
+const getUsersById = (req, res) => {
   const { id } = req.params;
   User.findById(id)
     .then((user) => {
@@ -15,23 +15,21 @@ const getUsersById = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
-      next(err);
-    })
-    .catch(next);
+    });
 };
 
-const createUser = (req, res, next) => {
+const createUser = (req, res) => {
   const newUser = req.body;
   return User.create(newUser)
     .then((user) => res.status(201).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`);
-      } next(err);
-    }).catch(next);
+      }
+    });
 };
 
-const patchUserById = (req, res, next) => {
+const patchUserById = (req, res) => {
   const newUser = req.body;
   const id = req.user._id;
   return User.findByIdAndUpdate(id, newUser, {
@@ -48,11 +46,10 @@ const patchUserById = (req, res, next) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`);
       }
-      next(err);
-    }).catch(next);
+    });
 };
 
-const patchAvatarById = (req, res, next) => {
+const patchAvatarById = (req, res) => {
   const newUser = req.body;
   const id = req.user._id;
   return User.findByIdAndUpdate(id, newUser, {
@@ -71,8 +68,7 @@ const patchAvatarById = (req, res, next) => {
           `${Object.values(err.errors)}`,
         );
       }
-      next(err);
-    }).catch(next);
+    });
 };
 
 module.exports = {
