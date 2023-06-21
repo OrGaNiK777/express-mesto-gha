@@ -4,7 +4,7 @@ const BadRequestError = require('../errors/bad-request-error');// 400
 
 const getCards = (req, res) => Card.find({}).populate(['likes', 'owner']).then((cards) => res.status(200).send(cards));
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   // const newCard = req.body;
   const { name, link } = req.body;
   const owner = req.user;
@@ -16,10 +16,12 @@ const createCard = (req, res) => {
           `${Object.values(err.errors).map((error) => error.message).join(' and ')}`,
         );
       }
-    });
+      next(err);
+    })
+    .catch(next);
 };
 
-const deleteCardById = (req, res) => {
+const deleteCardById = (req, res, next) => {
   const { id } = req.params;
   Card.findByIdAndRemove(id, { new: true })
     .then((card) => {
@@ -35,9 +37,11 @@ const deleteCardById = (req, res) => {
           'Переданы некорректные данные для удаления карточки',
         );
       }
-    });
+      next(err);
+    })
+    .catch(next);
 };
-const putLikesCardById = (req, res) => {
+const putLikesCardById = (req, res, next) => {
   const { id } = req.params;
   Card.findByIdAndUpdate(
     id,
@@ -55,10 +59,12 @@ const putLikesCardById = (req, res) => {
           'Переданы некорректные данные для постановки лайка',
         );
       }
-    });
+      next(err);
+    })
+    .catch(next);
 };
 
-const deleteLikesCardById = (req, res) => {
+const deleteLikesCardById = (req, res, next) => {
   const { id } = req.params;
   Card.findByIdAndUpdate(
     id,
@@ -74,7 +80,9 @@ const deleteLikesCardById = (req, res) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные для удаления лайка');
       }
-    });
+      next(err);
+    })
+    .catch(next);
 };
 
 module.exports = {
