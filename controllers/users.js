@@ -9,10 +9,9 @@ const getUsersById = (req, res, next) => {
   User.findById(id)
     .then((user) => {
       res.status(200).send(user);
+      if (!user) { throw new NotFoundError(`Пользователь c id: ${id} не найден`); }
     })
     .catch((err) => {
-      if (!User) { throw new NotFoundError(`Пользователь c id: ${id} не найден`); }
-
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
