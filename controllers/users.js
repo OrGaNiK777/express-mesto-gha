@@ -6,12 +6,12 @@ const getUsers = (req, res) => User.find({}).then((user) => res.status(200).send
 
 const getUsersById = (req, res, next) => {
   const { id } = req.params;
-  User.findById(id)
+  return User.findById(id)
     .then((user) => {
-      res.status(200).send(user);
+      if (!user) { throw new NotFoundError(`Пользователь c id: ${id} не найден`); }
+      return res.status(200).send(user);
     })
     .catch((err) => {
-      if (!User) { throw new NotFoundError(`Пользователь c id: ${id} не найден`); }
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
