@@ -1,8 +1,10 @@
 const Card = require('../models/card');
+const NotFoundError = require('../errors/not-found-error');// 404
+const BadRequestError = require('../errors/bad-request-error');// 400
 
 const getCards = (req, res) => Card.find({}).populate(['likes', 'owner']).then((cards) => res.status(200).send(cards));
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   // const newCard = req.body;
   const { name, link } = req.body;
   const owner = req.user;
@@ -10,32 +12,34 @@ const createCard = (req, res) => {
     .then((newCard) => res.status(201).send(newCard))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({
-          message: `${Object.values(err.errors).map((error) => error.message).join(' and ')}`,
-        });
+        throw new BadRequestError(
+          `${Object.values(err.errors).map((error) => error.message).join(' and ')}`,
+        );
       }
-      return res.status(500).send({ message: `Ой ${err.name}` });
-    });
+      next(err);
+    })
+    .catch(next);
 };
 
-const deleteCardById = (req, res) => {
+const deleteCardById = (req, res, next) => {
   const { id } = req.params;
   Card.findByIdAndRemove(id, { new: true })
     .then((card) => {
       if (!card) {
-        return res.status(404).send({
-          message: 'Карточка с указаным id не найдена',
-        });
+        throw new NotFoundError(
+          'Карточка с указаным id не найдена',
+        );
       } return res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({
-          message: 'Переданы некорректные данные для удаления карточки',
-        });
+        throw new BadRequestError(
+          'Переданы некорректные данные для удаления карточки',
+        );
       }
-      return res.status(500).send({ message: `Ой ${err.name}` });
-    });
+      next(err);
+    })
+    .catch(next);
 };
 const putLikesCardById = (req, res) => {
   const { id } = req.params;
@@ -46,19 +50,18 @@ const putLikesCardById = (req, res) => {
   ).populate(['likes', 'owner']) // не совсем понимаю как это работает
     .then((card) => {
       if (!card) {
-        return res.status(404).send({
-          message: 'Карточка с указаным id не найдена',
-        });
+        throw new NotFoundError('Карточка с указаным id не найдена');
       } return res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({
-          message: 'Переданы некорректные данные для постановки лайка',
-        });
+        throw new BadRequestError(
+          'Переданы некорректные данные для постановки лайка',
+        );
       }
-      return res.status(500).send({ message: `Ой ${err.name}` });
+      // next(err);
     });
+  // .catch(next);
 };
 
 const deleteLikesCardById = (req, res) => {
@@ -70,18 +73,13 @@ const deleteLikesCardById = (req, res) => {
   ).populate(['likes', 'owner'])
     .then((card) => {
       if (!card) {
-        return res.status(404).send({
-          message: 'Карточка с указаным id не найдена',
-        });
+        throw new NotFoundError('Карточка с указаным id не найдена');
       } return res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({
-          message: 'Переданы некорректные данные для удаления лайка',
-        });
+        throw new BadRequestError('Переданы некорректные данные для удаления лайка');
       }
-      return res.status(500).send({ message: `Ой ${err.name}` });
     });
 };
 
