@@ -5,13 +5,13 @@ const BadRequestError = require('../errors/bad-request-error');// 400
 const getUsers = (req, res) => User.find({}).then((user) => res.status(200).send(user));
 
 const getUsersById = (req, res, next) => {
-  // const { id } = req.params;
-  User.findById(req.user._id)
+  const { id } = req.params;
+  User.findById(id)
     .then((user) => {
       res.status(200).send(user);
-      if (!User) { throw new NotFoundError(`Пользователь c id: ${req.user._id} не найден`); }
     })
     .catch((err) => {
+      if (!User) { throw new NotFoundError(`Пользователь c id: ${id} не найден`); }
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
