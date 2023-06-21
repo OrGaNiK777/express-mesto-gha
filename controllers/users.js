@@ -1,44 +1,38 @@
 const User = require('../models/user');
+const NotFoundError = require('../errors/not-found-error');// 404
+const BadRequestError = require('../errors/bad-request-error');// 400
 
 const getUsers = (req, res) => User.find({}).then((user) => res.status(200).send(user));
 
-const getUsersById = (req, res) => {
-  // const { id } = req.params;
-  User.findById(req.user._id).then((user) => {
-    if (!user) {
-      return res
-        .status(404)
-        .send({
-          // message: `Пользователь c id: ${id} не найден`,
-        });
-    }
-    return res.status(200).send(user);
-  })
+const getUsersById = (req, res, next) => {
+  const { id } = req.params;
+  User.findById(!id)
+    .orFail(new Error('NotValidId'))
+    .then((user) => {
+      res.status(200).send(user);
+    })
     .catch((err) => {
+      if (!User) { throw new NotFoundError(`Пользователь c id: ${!id} не найден`); }
       if (err.name === 'CastError') {
-        return res.status(400).send({
-          message: 'Переданы некорректные данные',
-        });
+        throw new BadRequestError('Переданы некорректные данные');
       }
-      return res.status(500).send({ message: `Ой ${err.name}` });
-    });
+      next(err);
+    })
+    .catch(next);
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const newUser = req.body;
   return User.create(newUser)
     .then((user) => res.status(201).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({
-          message: `${Object.values(err.errors).map((error) => error.message).join(' and ')}`,
-        });
-      }
-      return res.status(500).send({ message: `Ой ${err.name}` });
-    });
+        throw new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`);
+      } next(err);
+    }).catch(next);
 };
 
-const patchUserById = (req, res) => {
+const patchUserById = (req, res, next) => {
   const newUser = req.body;
   const id = req.user._id;
   return User.findByIdAndUpdate(id, newUser, {
@@ -47,23 +41,19 @@ const patchUserById = (req, res) => {
   })
     .then((user) => {
       if (!req.user._id) {
-        return res
-          .status(404)
-          .send(`Пользователь по id  ${req.user._id} не найден`);
+        throw new NotFoundError(`Пользователь по id  ${req.user._id} не найден`);
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({
-          message: `${Object.values(err.errors).map((error) => error.message).join(' and ')}`,
-        });
+        throw new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`);
       }
-      return res.status(500).send({ message: `Ой ${err.name}` });
-    });
+      next(err);
+    }).catch(next);
 };
 
-const patchAvatarById = (req, res) => {
+const patchAvatarById = (req, res, next) => {
   const newUser = req.body;
   const id = req.user._id;
   return User.findByIdAndUpdate(id, newUser, {
@@ -72,20 +62,18 @@ const patchAvatarById = (req, res) => {
   })
     .then((user) => {
       if (!req.user._id) {
-        return res
-          .status(404)
-          .send(`Пользователь по id  ${req.user._id} не найден`);
+        throw new NotFoundError(`Пользователь по id  ${req.user._id} не найден`);
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({
-          message: `${Object.values(err.errors)}`,
-        });
+        throw new BadRequestError(
+          `${Object.values(err.errors)}`,
+        );
       }
-      return res.status(500).send({ message: `Ой ${err.name}` });
-    });
+      next(err);
+    }).catch(next);
 };
 
 module.exports = {
