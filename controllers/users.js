@@ -1,21 +1,23 @@
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-error');// 404
 const BadRequestError = require('../errors/bad-request-error');// 400
+const CODE_200_OK = require('../utils/constants');
 
-const getUsers = (req, res) => User.find({}).then((user) => res.status(200).send(user));
+const getUsers = (req, res) => User.find({}).then((user) => res.status(CODE_200_OK)
+  .send(user)).catch((err) => { throw new Error(err); });
 
 const getUsersById = (req, res, next) => {
   const { id } = req.params;
   return User.findById(id)
     .then((user) => {
       if (!user) { throw new NotFoundError(`Пользователь c id: ${id} не найден`); }
-      return res.status(200).send(user);
+      return res.status(CODE_200_OK).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
-      next(err);
+      return new Error(err);
     })
     .catch(next);
 };
@@ -28,7 +30,6 @@ const createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`);
       }
-      next(err);
     })
     .catch(next);
 };
@@ -44,13 +45,12 @@ const patchUserById = (req, res, next) => {
       if (!req.user._id) {
         throw new NotFoundError(`Пользователь по id  ${req.user._id} не найден`);
       }
-      return res.status(200).send(user);
+      return res.status(CODE_200_OK).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`);
       }
-      next(err);
     })
     .catch(next);
 };
@@ -66,7 +66,7 @@ const patchAvatarById = (req, res, next) => {
       if (!req.user._id) {
         throw new NotFoundError(`Пользователь по id  ${req.user._id} не найден`);
       }
-      return res.status(200).send(user);
+      return res.status(CODE_200_OK).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -74,7 +74,6 @@ const patchAvatarById = (req, res, next) => {
           `${Object.values(err.errors)}`,
         );
       }
-      next(err);
     })
     .catch(next);
 };
