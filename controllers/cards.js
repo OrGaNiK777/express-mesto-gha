@@ -59,7 +59,8 @@ const putLikesCardById = (req, res, next) => {
         throw new BadRequestError(
           'Переданы некорректные данные для постановки лайка',
         );
-      } return new Error(err.name);
+      }
+      next(err)
     })
     .catch(next);
 };
