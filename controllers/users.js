@@ -9,9 +9,10 @@ const getUsers = (req, res) => User.find({}).then((user) => res.status(CODE_200_
 const getUsersById = (req, res, next) => {
   const { id } = req.params;
   return User.findById(id)
+    .orFail(new Error('NotValidId'))
     .then((user) => res.status(CODE_200_OK).send(user))
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') { throw new NotFoundError(`Пользователь c id: ${id} не найден`); }
+      if (err.message === 'NotValidId') { throw new NotFoundError(`Пользователь c id: ${id} не найден`); }
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
@@ -39,9 +40,10 @@ const patchUserById = (req, res, next) => {
     new: true,
     runValidators: true,
   })
+    .orFail(new Error('NotValidId'))
     .then((user) => res.status(CODE_200_OK).send(user))
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
+      if (err.message === 'NotValidId') {
         throw new NotFoundError(`Пользователь по id  ${req.user._id} не найден`);
       }
       if (err.name === 'ValidationError') {

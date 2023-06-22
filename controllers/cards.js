@@ -26,9 +26,10 @@ const createCard = (req, res, next) => {
 const deleteCardById = (req, res, next) => {
   const { id } = req.params;
   Card.findByIdAndRemove(id, { new: true })
+    .orFail(new Error('NotValidId'))
     .then((card) => res.status(CODE_200_OK).send(card))
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
+      if (err.message === 'NotValidId') {
         throw new NotFoundError(
           'Карточка с указаным id не найдена',
         );
@@ -48,9 +49,10 @@ const putLikesCardById = (req, res, next) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   ).populate(['likes', 'owner']) // не совсем понимаю как это работает
+    .orFail(new Error('NotValidId'))
     .then((card) => res.status(CODE_200_OK).send(card))
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
+      if (err.message === 'NotValidId') {
         throw new NotFoundError('Карточка с указаным id не найдена');
       }
       if (err.name === 'CastError') {
@@ -69,9 +71,10 @@ const deleteLikesCardById = (req, res, next) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   ).populate(['likes', 'owner'])
+    .orFail(new Error('NotValidId'))
     .then((card) => res.status(CODE_200_OK).send(card))
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
+      if (err.message === 'NotValidId') {
         throw new NotFoundError('Карточка с указаным id не найдена');
       }
       if (err.name === 'CastError') {
