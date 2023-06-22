@@ -26,14 +26,13 @@ const createCard = (req, res, next) => {
 const deleteCardById = (req, res, next) => {
   const { id } = req.params;
   Card.findByIdAndRemove(id, { new: true })
-    .then((card) => {
-      if (!card) {
+    .then((card) => res.status(CODE_200_OK).send(card))
+    .catch((err) => {
+      if (err.message === 'DocumentNotFoundError') {
         throw new NotFoundError(
           'Карточка с указаным id не найдена',
         );
-      } return res.status(CODE_200_OK).send(card);
-    })
-    .catch((err) => {
+      }
       if (err.name === 'CastError') {
         throw new BadRequestError(
           'Переданы некорректные данные для удаления карточки',
@@ -49,18 +48,16 @@ const putLikesCardById = (req, res, next) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   ).populate(['likes', 'owner']) // не совсем понимаю как это работает
-    .then((card) => {
-      if (!card) {
-        throw new NotFoundError('Карточка с указаным id не найдена');
-      } return res.status(CODE_200_OK).send(card);
-    })
+    .then((card) => res.status(CODE_200_OK).send(card))
     .catch((err) => {
+      if (err.message === 'DocumentNotFoundError') {
+        throw new NotFoundError('Карточка с указаным id не найдена');
+      }
       if (err.name === 'CastError') {
         throw new BadRequestError(
           'Переданы некорректные данные для постановки лайка',
         );
       }
-      next(err)
     })
     .catch(next);
 };
@@ -72,12 +69,11 @@ const deleteLikesCardById = (req, res, next) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   ).populate(['likes', 'owner'])
-    .then((card) => {
-      if (!card) {
-        throw new NotFoundError('Карточка с указаным id не найдена');
-      } return res.status(CODE_200_OK).send(card);
-    })
+    .then((card) => res.status(CODE_200_OK).send(card))
     .catch((err) => {
+      if (err.message === 'DocumentNotFoundError') {
+        throw new NotFoundError('Карточка с указаным id не найдена');
+      }
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные для удаления лайка');
       } return new Error(err.name);
