@@ -4,13 +4,13 @@ const BadRequestError = require('../errors/bad-request-error');// 400
 const CODE_200_OK = require('../utils/constants');
 
 const getUsers = (req, res) => User.find({}).then((user) => res.status(CODE_200_OK)
-  .send(user)).catch((err) => { throw new Error(err); });
+  .send(user)).catch(() => { throw new Error(); });
 
 const getUsersById = (req, res, next) => {
   const { id } = req.params;
   return User.findById(id)
     .then((user) => {
-      if (!user) { throw new NotFoundError(`Пользователь c id: ${id} не найден`); }
+      if (user) { throw new NotFoundError(`Пользователь c id: ${id} не найден`); }
       return res.status(CODE_200_OK).send(user);
     })
     .catch((err) => {
@@ -63,7 +63,7 @@ const patchAvatarById = (req, res, next) => {
     runValidators: true,
   })
     .then((user) => {
-      if (!req.user._id) {
+      if (req.user._id) {
         throw new NotFoundError(`Пользователь по id  ${req.user._id} не найден`);
       }
       return res.status(CODE_200_OK).send(user);
