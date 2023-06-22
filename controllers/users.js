@@ -4,7 +4,7 @@ const BadRequestError = require('../errors/bad-request-error');// 400
 const CODE_200_OK = require('../utils/constants');
 
 const getUsers = (req, res) => User.find({}).then((user) => res.status(CODE_200_OK)
-  .send(user)).catch(() => { throw new Error(); });
+  .send(user)).catch((err) => { throw new Error(err.name); });
 
 const getUsersById = (req, res, next) => {
   const { id } = req.params;
@@ -17,7 +17,7 @@ const getUsersById = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
-      return new Error(err.name);
+      next(err);
     })
     .catch(next);
 };

@@ -1,5 +1,4 @@
-// 404 — объект не найден;
-
+// 404 — объект не найден;\
 class NotFoundError extends Error {
   constructor(message) {
     super(message);
