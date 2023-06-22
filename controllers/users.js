@@ -29,7 +29,7 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`);
-      }
+      } return new Error(err);
     })
     .catch(next);
 };
@@ -50,7 +50,7 @@ const patchUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`);
-      }
+      } return new Error(err);
     })
     .catch(next);
 };
@@ -73,7 +73,7 @@ const patchAvatarById = (req, res, next) => {
         throw new BadRequestError(
           `${Object.values(err.errors)}`,
         );
-      }
+      } return new Error(err);
     })
     .catch(next);
 };

@@ -18,6 +18,7 @@ const createCard = (req, res, next) => {
           `${Object.values(err.errors).map((error) => error.message).join(' and ')}`,
         );
       }
+      return new Error(err);
     })
     .catch(next);
 };
@@ -37,7 +38,7 @@ const deleteCardById = (req, res, next) => {
         throw new BadRequestError(
           'Переданы некорректные данные для удаления карточки',
         );
-      }
+      } return new Error(err);
     })
     .catch(next);
 };
@@ -58,7 +59,7 @@ const putLikesCardById = (req, res, next) => {
         throw new BadRequestError(
           'Переданы некорректные данные для постановки лайка',
         );
-      }
+      } return new Error(err);
     })
     .catch(next);
 };
@@ -78,7 +79,7 @@ const deleteLikesCardById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные для удаления лайка');
-      }
+      } return new Error(err);
     })
     .catch(next);
 };
