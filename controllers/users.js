@@ -10,14 +10,14 @@ const getUsersById = (req, res, next) => {
   const { id } = req.params;
   return User.findById(id)
     .then((user) => {
-      if (user) { throw new NotFoundError(`Пользователь c id: ${id} не найден`); }
+      if (!user) { throw new NotFoundError(`Пользователь c id: ${id} не найден`); }
       return res.status(CODE_200_OK).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
-      return new Error(err);
+      return new Error(err.name);
     })
     .catch(next);
 };
@@ -29,7 +29,7 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`);
-      } return new Error(err);
+      } return new Error(err.name);
     })
     .catch(next);
 };
@@ -50,7 +50,7 @@ const patchUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`);
-      } return new Error(err);
+      } return new Error(err.name);
     })
     .catch(next);
 };
@@ -73,7 +73,7 @@ const patchAvatarById = (req, res, next) => {
         throw new BadRequestError(
           `${Object.values(err.errors)}`,
         );
-      } return new Error(err);
+      } return new Error(err.name);
     })
     .catch(next);
 };
