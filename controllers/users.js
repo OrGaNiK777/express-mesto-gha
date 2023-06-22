@@ -11,7 +11,7 @@ const getUsersById = (req, res, next) => {
   return User.findById(id)
     .then((user) => res.status(CODE_200_OK).send(user))
     .catch((err) => {
-      if (err.message === 'DocumentNotFoundError') { throw new NotFoundError(`Пользователь c id: ${id} не найден`); }
+      if (err.name === 'DocumentNotFoundError') { throw new NotFoundError(`Пользователь c id: ${id} не найден`); }
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
       }
@@ -41,7 +41,7 @@ const patchUserById = (req, res, next) => {
   })
     .then((user) => res.status(CODE_200_OK).send(user))
     .catch((err) => {
-      if (err.message === 'DocumentNotFoundError') {
+      if (err.name === 'DocumentNotFoundError') {
         throw new NotFoundError(`Пользователь по id  ${req.user._id} не найден`);
       }
       if (err.name === 'ValidationError') {

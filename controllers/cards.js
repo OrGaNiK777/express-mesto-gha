@@ -28,7 +28,7 @@ const deleteCardById = (req, res, next) => {
   Card.findByIdAndRemove(id, { new: true })
     .then((card) => res.status(CODE_200_OK).send(card))
     .catch((err) => {
-      if (err.message === 'DocumentNotFoundError') {
+      if (err.name === 'DocumentNotFoundError') {
         throw new NotFoundError(
           'Карточка с указаным id не найдена',
         );
@@ -50,7 +50,7 @@ const putLikesCardById = (req, res, next) => {
   ).populate(['likes', 'owner']) // не совсем понимаю как это работает
     .then((card) => res.status(CODE_200_OK).send(card))
     .catch((err) => {
-      if (err.message === 'DocumentNotFoundError') {
+      if (err.name === 'DocumentNotFoundError') {
         throw new NotFoundError('Карточка с указаным id не найдена');
       }
       if (err.name === 'CastError') {
@@ -71,7 +71,7 @@ const deleteLikesCardById = (req, res, next) => {
   ).populate(['likes', 'owner'])
     .then((card) => res.status(CODE_200_OK).send(card))
     .catch((err) => {
-      if (err.message === 'DocumentNotFoundError') {
+      if (err.name === 'DocumentNotFoundError') {
         throw new NotFoundError('Карточка с указаным id не найдена');
       }
       if (err.name === 'CastError') {
