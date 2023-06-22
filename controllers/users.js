@@ -63,7 +63,7 @@ const patchAvatarById = (req, res, next) => {
     runValidators: true,
   })
     .then((user) => {
-      if (req.user._id) {
+      if (!req.user._id) {
         throw new NotFoundError(`Пользователь по id  ${req.user._id} не найден`);
       }
       return res.status(CODE_200_OK).send(user);

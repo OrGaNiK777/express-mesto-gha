@@ -1,10 +1,9 @@
-// 404 — объект не найден
-const CODE_404_ERR = require('../utils/constants');
+// 404 — объект не найден;
 
 class NotFoundError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = CODE_404_ERR;
+    this.statusCode = 404;
   }
 }
 
