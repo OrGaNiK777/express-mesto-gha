@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const routes = require('./routes/index');
-const customErrorsHandler = require('./middlewares/customErrorsHandler');
 
 const host = 'localhost';
 
@@ -31,7 +30,6 @@ app.use((req, res, next) => {
 });
 
 app.use(routes);
-app.use(customErrorsHandler);
 app.listen(PORT, host, () => {
   // eslint-disable-next-line no-console
   console.log(`Cервер запущен на http://${host}:${PORT}/`);
