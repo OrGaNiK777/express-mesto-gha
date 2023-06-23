@@ -55,7 +55,7 @@ const putLikesCardById = (req, res) => {
     .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        return res.status(httpConstants.HTTP_STATUS_NOT_FOUND).send({ message: 'Карточка с указаным id не найдена' });
+        return res.status(httpConstants.HTTP_STATUS_NOT_FOUND).send({ message: 'Карточка с указаным id не  найдена' });
       }
       if (err.name === 'CastError') {
         return res.status(httpConstants.HTTP_STATUS_BAD_REQUEST).send({
