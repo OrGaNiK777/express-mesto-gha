@@ -1,9 +1,10 @@
 const httpConstants = require('http2').constants;
 const User = require('../models/user');
+// Я убрал все это нагромождение начал теряться
 
 const getUsers = (req, res) => User.find({})
-  .then((user) => res.status(httpConstants.HTTP_STATUS_OK)
-    .send(user)).catch((err) => { throw new Error(err); });
+  .then((user) => { res.status(httpConstants.HTTP_STATUS_OK).send(user); })
+  .catch((err) => { throw new Error(err); });
 
 const getUsersById = (req, res) => {
   const { id } = req.params;
@@ -27,7 +28,7 @@ const createUser = (req, res) => {
     .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(httpConstants.HTTP_STATUS_BAD_REQUEST).send({ message: `${Object.values(err.errors).map((error) => error.message).join(' and ')}` });
+        return res.status(httpConstants.HTTP_STATUS_BAD_REQUEST).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
       }
       return res.status(httpConstants.HTTP_STATUS_SERVER_ERROR).send({ message: 'Произошла ошибка сервера' });
     });
@@ -47,7 +48,7 @@ const patchUserById = (req, res) => {
         return res.status(httpConstants.HTTP_STATUS_NOT_FOUND).send({ message: `Пользователь по id  ${req.user._id} не найден` });
       }
       if (err.name === 'ValidationError') {
-        return res.status(httpConstants.HTTP_STATUS_BAD_REQUEST).send({ message: `${Object.values(err.errors).map((error) => error.message).join(' and ')}` });
+        return res.status(httpConstants.HTTP_STATUS_BAD_REQUEST).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
       }
       return res.status(httpConstants.HTTP_STATUS_SERVER_ERROR).send({ message: 'Произошла ошибка сервера' });
     });

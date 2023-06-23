@@ -1,5 +1,6 @@
 const httpConstants = require('http2').constants;
 const Card = require('../models/card');
+// Я убрал все это нагромождение начал теряться
 
 const getCards = (req, res) => Card.find({}).populate(['likes', 'owner'])
   .then((cards) => res.status(httpConstants.HTTP_STATUS_OK).send(cards))
@@ -15,7 +16,7 @@ const createCard = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(httpConstants.HTTP_STATUS_BAD_REQUEST).send({
           message:
-            `${Object.values(err.errors).map((error) => error.message).join(' and ')}`,
+            `${Object.values(err.errors).map((error) => error.message).join(', ')}`,
         });
       }
       return res.status(httpConstants.HTTP_STATUS_SERVER_ERROR).send({ message: 'Произошла ошибка сервера' });
