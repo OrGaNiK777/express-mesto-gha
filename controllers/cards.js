@@ -13,7 +13,7 @@ const createCard = (req, res) => {
     .then((newCard) => res.status(httpConstants.HTTP_STATUS_CREATED).send(newCard))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(httpConstants.HTTP_STATUS_NOT_FOUND).send({
+        return res.status(httpConstants.HTTP_STATUS_BAD_REQUEST).send({
           message:
             `${Object.values(err.errors).map((error) => error.message).join(' and ')}`,
         });
