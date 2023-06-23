@@ -1,9 +1,10 @@
-// 404 — объект не найден;\
+// // 404 — объект не найден;\
+const httpConstants = require('http2').constants;
 
 class NotFoundError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = 404;
+    this.statusCode = httpConstants.HTTS_STATUS_NOT_FOUND;
   }
 }
 

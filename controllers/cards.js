@@ -1,17 +1,17 @@
+const httpConstants = require('http2').constants;
 const Card = require('../models/card');
-const NotFoundError = require('../errors/not-found-error');// 404
-const BadRequestError = require('../errors/bad-request-error');// 400
-const CODE_200_OK = require('../utils/constants');
+const NotFoundError = require('../errors/not-found-error');
+const BadRequestError = require('../errors/bad-request-error');
 
-const getCards = (req, res) => Card.find({}).populate(['likes', 'owner']).then((cards) => res.status(CODE_200_OK).send(cards))
-  .catch((err) => { throw new Error(err.name); });
+const getCards = (req, res) => Card.find({}).populate(['likes', 'owner']).then((cards) => res.status(httpConstants.HTTP_STATUS_OK).send(cards))
+  .catch((err) => { throw new Error(err); });
 
 const createCard = (req, res, next) => {
   // const newCard = req.body;
   const { name, link } = req.body;
   const owner = req.user;
   Card.create({ name, link, owner })
-    .then((newCard) => res.status(201).send(newCard))
+    .then((newCard) => res.status(httpConstants.HTTP_STATUS_CREATED).send(newCard))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError(
@@ -27,7 +27,7 @@ const deleteCardById = (req, res, next) => {
   const { id } = req.params;
   Card.findByIdAndRemove(id, { new: true })
     .orFail(new Error('NotValidId'))
-    .then((card) => res.status(CODE_200_OK).send(card))
+    .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.message === 'NotValidId') {
         throw new NotFoundError(
@@ -50,7 +50,7 @@ const putLikesCardById = (req, res, next) => {
     { new: true },
   ).populate(['likes', 'owner']) // не совсем понимаю как это работает
     .orFail(new Error('NotValidId'))
-    .then((card) => res.status(CODE_200_OK).send(card))
+    .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.message === 'NotValidId') {
         throw new NotFoundError('Карточка с указаным id не найдена');
@@ -72,7 +72,7 @@ const deleteLikesCardById = (req, res, next) => {
     { new: true },
   ).populate(['likes', 'owner'])
     .orFail(new Error('NotValidId'))
-    .then((card) => res.status(CODE_200_OK).send(card))
+    .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.message === 'NotValidId') {
         throw new NotFoundError('Карточка с указаным id не найдена');
