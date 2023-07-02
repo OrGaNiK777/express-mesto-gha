@@ -6,16 +6,19 @@ const {
   getUsersById,
   patchUserById,
   patchAvatarById,
+  login,
 } = require('../controllers/users');
 
-router.get('/users', getUsers);
+router.get('/users/me', getUsers);
 
 router.get('/users/:id', getUsersById);
-
-router.post('/users', createUser);
 
 router.patch('/users/me', patchUserById);
 
 router.patch('/users/me/avatar', patchAvatarById);
+
+router.post('/signup', createUser);
+
+router.post('/signin', login);
 
 module.exports = router;

@@ -1,6 +1,5 @@
 const httpConstants = require('http2').constants;
 const Card = require('../models/card');
-// Я убрал все это нагромождение начал теряться
 
 const getCards = (req, res) => Card.find({}).populate(['likes', 'owner'])
   .then((cards) => res.status(httpConstants.HTTP_STATUS_OK).send(cards))
