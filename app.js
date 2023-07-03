@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const routes = require('./routes/index');
-const auth = require('./middlewares/auth');
 
 const host = 'localhost';
 
@@ -22,15 +21,6 @@ mongoose
   });
 
 app.use(express.json());
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: '648f4eceac33ebb800e0acee', // вставьте сюда _id созданного в предыдущем пункте пользователя
-  };
-  next();
-});
-
-app.use(auth);
 
 app.use(routes);
 

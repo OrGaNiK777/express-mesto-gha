@@ -1,13 +1,11 @@
-const httpConstants = require('http2').constants;
-const verifyToken = require('../utils/jwt');
+const NotAuthError = require('../errors/not-auth-error');
+const { verifyToken } = require('../utils/jwt');
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res
-      .status(httpConstants.HTTP_STATUS_UNAUTHORIZED)
-      .send({ message: 'Необходима авторизация' });
+  if (!authorization) {
+    next(new NotAuthError({ message: 'Необходима авторизация' }));
   }
 
   let payload;
@@ -15,9 +13,7 @@ module.exports = (req, res, next) => {
   try {
     payload = verifyToken(authorization);
   } catch (err) {
-    return res
-      .status(httpConstants.HTTP_STATUS_UNAUTHORIZED)
-      .send({ message: 'Необходима авторизация' });
+    next(new NotAuthError({ message: 'Необходима авторизация' }));
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
