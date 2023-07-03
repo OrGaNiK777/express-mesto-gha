@@ -9,17 +9,15 @@ const getCards = (req, res, next) => Card.find({}).populate(['likes', 'owner'])
   .catch(next);
 
 const createCard = (req, res, next) => {
-  // const newCard = req.body;
   const { name, link } = req.body;
   const owner = req.user;
   Card.create({ name, link, owner })
     .then((newCard) => res.status(httpConstants.HTTP_STATUS_CREATED).send(newCard))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError({
-          message:
-            `${Object.values(err.errors).map((error) => error.message).join(', ')}`,
-        });
+        throw new BadRequestError(
+          `${Object.values(err.errors).map((error) => error.message).join(', ')}`,
+        );
       }
       next(err);
     })
@@ -33,16 +31,12 @@ const deleteCardById = (req, res, next) => {
     .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        throw new NotFoundError({
-          message:
-            'Карточка с указаным id не найдена',
-        });
+        throw new NotFoundError(
+          'Карточка с указаным id не найдена',
+        );
       }
       if (err.name === 'CastError') {
-        throw new BadRequestError({
-          message:
-            'Переданы некорректные данные для удаления карточки',
-        });
+        throw new BadRequestError('Переданы некорректные данные для удаления карточки');
       }
       next(err);
     })
@@ -59,13 +53,12 @@ const putLikesCardById = (req, res, next) => {
     .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        throw new NotFoundError({ message: 'Карточка с указаным id не  найдена' });
+        throw new NotFoundError('Карточка с указаным id не  найдена');
       }
       if (err.name === 'CastError') {
-        throw new BadRequestError({
-          message:
-            'Переданы некорректные данные для постановки лайка',
-        });
+        throw new BadRequestError(
+          'Переданы некорректные данные для постановки лайка',
+        );
       }
       next(err);
     })
@@ -83,10 +76,10 @@ const deleteLikesCardById = (req, res, next) => {
     .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        throw new NotFoundError({ message: 'Карточка с указаным id не найдена' });
+        throw new NotFoundError('Карточка с указаным id не найдена');
       }
       if (err.name === 'CastError') {
-        throw new BadRequestError({ message: 'Переданы некорректные данные для удаления лайка' });
+        throw new BadRequestError('Переданы некорректные данные для удаления лайка');
       }
       next(err);
     })

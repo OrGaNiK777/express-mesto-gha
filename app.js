@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
+
 const routes = require('./routes/index');
+const customErrorsHandler = require('./middlewares/customErrorsHandler');
 
 const host = 'localhost';
 
@@ -23,6 +25,8 @@ mongoose
 app.use(express.json());
 
 app.use(routes);
+
+app.use(customErrorsHandler);
 
 app.listen(PORT, host, () => {
   // eslint-disable-next-line no-console

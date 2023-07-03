@@ -22,13 +22,14 @@ function getCurrentUser(req, res, next) {
     .then((user) => { res.status(httpConstants.HTTP_STATUS_OK).send(user); })
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        throw new NotFoundError({ message: `Пользователь c id: ${id} не найден` });
+        throw new NotFoundError(`Пользователь c id: ${id} не найден`);
       }
       if (err.name === 'CastError') {
-        throw new BadRequestError({ message: 'Переданы некорректные данные' });
+        throw new BadRequestError('Переданы некорректные данные');
       }
       next(err);
-    }).catch(next);
+    })
+    .catch(next);
 }
 
 const getUsersById = (req, res, next) => {
@@ -38,10 +39,10 @@ const getUsersById = (req, res, next) => {
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        throw new NotFoundError({ message: `Пользователь c id: ${id} не найден` });
+        throw new NotFoundError(`Пользователь c id: ${id} не найден`);
       }
       if (err.name === 'CastError') {
-        throw new BadRequestError({ message: 'Переданы некорректные данные' });
+        throw new BadRequestError('Переданы некорректные данные');
       }
       next(err);
     })
@@ -52,11 +53,11 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!email || !password) { throw new BadRequestError({ message: 'Не передан email или пароль' }); }
+  if (!email || !password) { throw new BadRequestError('Не передан email или пароль'); }
   return User.findOne({ email }).select('+password')
     .then((emailCheck) => {
       if (emailCheck) {
-        throw new ConflictError({ message: 'Пользователь уже существует' });
+        throw new ConflictError('Пользователь уже существует');
       }
       return bcrypt.hash(password, saltRounds, (err1, hash) => User.create({
         name, about, avatar, email, password: hash,
@@ -74,14 +75,14 @@ const createUser = (req, res, next) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  if (!email || !password) { throw new BadRequestError({ message: 'Не передан email или пароль' }); }
+  if (!email || !password) { throw new BadRequestError('Не передан email или пароль'); }
   return User.findOne({ email })
     .then((user) => {
       if (!user) {
-        throw new ForbiddenError({ message: 'Пользователь не найден' });
+        throw new ForbiddenError('Пользователь не найден');
       }
       return bcrypt.compare(password, user.password, (err, result) => {
-        if (!result) { throw new NotAuthError({ message: 'Не верный email или пароль' }); }
+        if (!result) { throw new NotAuthError('Не верный email или пароль'); }
         const token = generateToken(user._id);
 
         return res.status(httpConstants.HTTP_STATUS_OK).send({ token });
@@ -101,10 +102,10 @@ const patchUserById = (req, res, next) => {
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        throw new NotFoundError({ message: `Пользователь по id  ${req.user._id} не найден` });
+        throw new NotFoundError(`Пользователь по id  ${req.user._id} не найден`);
       }
       if (err.name === 'ValidationError') {
-        throw new BadRequestError({ message: `${Object.values(err.errors).map((error) => error.message).join(' and ')}` });
+        throw new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`);
       }
       next(err);
     })
@@ -121,7 +122,7 @@ const patchAvatarById = (req, res, next) => {
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (!req.user) {
-        throw new NotFoundError({ message: `Пользователь по id  ${req.user._id} не найден` });
+        throw new NotFoundError(`Пользователь по id  ${req.user._id} не найден`);
       }
       if (err.name === 'ValidationError') {
         throw new BadRequestError({
