@@ -59,16 +59,19 @@ const createUser = (req, res, next) => {
       if (emailCheck) {
         throw new ConflictError('Пользователь уже существует');
       }
-      return bcrypt.hash(password, saltRounds, (err1, hash) => User.create({
-        name, about, avatar, email, password: hash,
-      })
-        .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send(user))
+      bcrypt.hash(password, saltRounds)
+        .then((hash) => User.create({
+          name, about, avatar, email, password: hash,
+        }))
+        .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send({
+          _id: user._id,
+          email: user.email,
+        }))
         .catch((err) => {
           if (err.name === 'ValidationError') {
-            throw new BadRequestError({ message: `${Object.values(err.errors).map((error) => error.message).join(' and ')}` });
+            next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`));
           }
-          return next(err);
-        }));
+        });
     })
     .catch(next);
 };
@@ -76,7 +79,7 @@ const createUser = (req, res, next) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) { throw new BadRequestError('Не передан email или пароль'); }
-  return User.findOne({ email })
+  return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
         throw new ForbiddenError('Пользователь не найден');
@@ -125,10 +128,7 @@ const patchAvatarById = (req, res, next) => {
         throw new NotFoundError(`Пользователь по id  ${req.user._id} не найден`);
       }
       if (err.name === 'ValidationError') {
-        throw new BadRequestError({
-          message:
-            `${Object.values(err.errors)}`,
-        });
+        throw new BadRequestError(`${Object.values(err.errors)}`);
       }
       next(err);
     })
