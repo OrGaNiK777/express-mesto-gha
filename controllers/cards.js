@@ -26,20 +26,17 @@ const createCard = (req, res, next) => {
 };
 
 const deleteCardById = (req, res, next) => {
-  const { id } = req.params;
-  Card.findByIdAndRemove(id, { new: true })
+  Card.findById(req.params.id)
     .orFail(new Error('NotValidId'))
     .then((card) => {
-      const userId = req.user.id;
-      const cardOwnerId = card.owner.toString();
-      if (cardOwnerId === userId) {
-        card.remove()
-          .catch(next);
+      if (req.user.id === card.owner.toString()) {
+        card.remove();
+        res.status(httpConstants.HTTP_STATUS_OK).send({ message: 'Карта удалена' });
+        // .catch(next);
       } else {
         throw new ForbiddenError('Попытка удалить чужую карточку');
       }
     })
-    .then(() => res.status(httpConstants.HTTP_STATUS_OK).send({ message: 'Карта удалена' }))
     .catch((err) => {
       if (err.message === 'NotValidId') {
         throw new NotFoundError(
