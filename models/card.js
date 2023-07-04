@@ -5,10 +5,18 @@ const cardSchema = new mongoose.Schema([
     name: {
       type: String,
       required: true,
+      minlength: 2,
+      maxlength: 30,
     },
     link: {
       type: String,
       required: true,
+      validate: {
+        validator(link) {
+          return /^(https|http):\/\/(www)?[^ "]+/gim.test(link);
+        },
+        message: 'Ссылка некорректна',
+      },
     },
     createdAt: {
       type: Date,
@@ -21,7 +29,6 @@ const cardSchema = new mongoose.Schema([
         default: [],
       },
     ],
-
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'user',
