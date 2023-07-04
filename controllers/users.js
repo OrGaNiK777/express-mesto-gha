@@ -68,9 +68,7 @@ const createUser = (req, res, next) => {
           email: user.email,
         }))
         .catch((err) => {
-          if (err.name === 'ValidationError') {
-            next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`));
-          }
+          next(err);
         });
     })
     .catch(next);
