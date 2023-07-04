@@ -26,7 +26,6 @@ app.use(express.json());
 
 app.use(routes);
 
-
 app.listen(PORT, host, () => {
   // eslint-disable-next-line no-console
   console.log(`Cервер запущен на http://${host}:${PORT}/`);

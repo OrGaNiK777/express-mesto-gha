@@ -32,17 +32,17 @@ function getCurrentUser(req, res, next) {
 }
 
 const getUsersById = (req, res, next) => {
-  const { id } = req.params;
-  console.log(req.params);
-  return User.findById(id)
+  User.findById(req.params.id)
     .orFail(new Error('NotValidId'))
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
-      if (err.message === 'NotValidId') {
-        throw new NotFoundError(`Пользователь c id: ${id} не найден`);
-      }
       if (err.name === 'CastError') {
+        console.log(err.name);
         throw new BadRequestError('Переданы некорректные данные');
+      }
+      if (err.message === 'NotValidId') {
+        console.log(err.message);
+        throw new NotFoundError(`Пользователь c id: ${req.params.id} не найден`);
       }
       next(err);
     })
