@@ -3,6 +3,7 @@ const Card = require('../models/card');
 
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
+const ForbiddenError = require('../errors/bad-request-error');
 
 const getCards = (req, res, next) => Card.find({}).populate(['likes', 'owner'])
   .then((cards) => res.status(httpConstants.HTTP_STATUS_OK).send(cards))
@@ -28,11 +29,21 @@ const deleteCardById = (req, res, next) => {
   const { id } = req.params;
   Card.findByIdAndRemove(id, { new: true })
     .orFail(new Error('NotValidId'))
-    .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
+    .then((card) => {
+      const userId = req.user.id;
+      const cardOwnerId = card.owner.toString();
+      if (cardOwnerId === userId) {
+        card.remove()
+          .catch(next);
+      } else {
+        throw new ForbiddenError('Попытка удалить чужую карточку');
+      }
+    })
+    .then(() => res.status(httpConstants.HTTP_STATUS_OK).send({ message: 'Карта удалена' }))
     .catch((err) => {
       if (err.message === 'NotValidId') {
         throw new NotFoundError(
-          'Карточка с указаным id не найдена',
+          `Карточка с id ${req.params.id} не найдена`,
         );
       }
       if (err.name === 'CastError') {
