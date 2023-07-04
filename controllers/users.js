@@ -33,6 +33,7 @@ function getCurrentUser(req, res, next) {
 
 const getUsersById = (req, res, next) => {
   const { id } = req.params;
+  console.log(req.params);
   return User.findById(id)
     .orFail(new Error('NotValidId'))
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
@@ -63,8 +64,10 @@ const createUser = (req, res, next) => {
           name, about, avatar, email, password: hash,
         }))
         .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send({
-          _id: user._id,
           email: user.email,
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
         }));
     })
     .catch(next);
