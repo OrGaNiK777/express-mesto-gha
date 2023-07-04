@@ -1,5 +1,4 @@
 const httpConstants = require('http2').constants;
-const { default: mongoose } = require('mongoose');
 const Card = require('../models/card');
 
 const NotFoundError = require('../errors/not-found-error');
@@ -27,29 +26,28 @@ const createCard = (req, res, next) => {
 };
 
 const deleteCardById = (req, res, next) => {
-  if (mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return Card.findById(req.params.id)
-      .orFail(new Error('NotValidId'))
-      .then((card) => {
-        if (card.owner.toString() === req.user.id) {
-          return Card.findByIdAndDelete(card.id)
-            .then(() => res.status(httpConstants.HTTP_STATUS_OK).send({ message: 'Карта удалена' }));
-        }
-        throw new ForbiddenError('Вы не можете удалять чужие карточки');
-      })
-      .catch((err) => {
-        if (err.message === 'NotValidId') {
-          throw new NotFoundError(
-            `Карточка с id ${req.params.id} не найдена`,
-          );
-        }
-        // if (err.name === 'CastError') {
-        //   throw new BadRequestError('Переданы некорректные данные для удаления карточки');
-        // }
-        next(err);
-      })
-      .catch(next);
-  } return next(new BadRequestError('Неверный формат id карточки'));
+  Card.findById(req.params.id)
+    .orFail(new Error('NotValidId'))
+    .then((card) => {
+      if (card.owner.toString() === req.user.id) {
+        return Card.findByIdAndDelete(card._id)
+          .orFail(() => new Error('С удалением что-то пошло не так'))
+          .then(res.status(httpConstants.HTTP_STATUS_OK).send({ message: 'Карта удалена' }));
+      }
+      throw new ForbiddenError('Попытка удалить чужую карточку');
+    })
+    .catch((err) => {
+      if (err.message === 'NotValidId') {
+        throw new NotFoundError(
+          `Карточка с id ${req.params.id} не найдена`,
+        );
+      }
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Переданы некорректные данные для удаления карточки');
+      }
+      next(err);
+    })
+    .catch(next);
 };
 
 const putLikesCardById = (req, res, next) => {
