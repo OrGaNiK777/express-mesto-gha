@@ -5,7 +5,7 @@ module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization) {
-    next(new NotAuthError('Необходима авторизация'));
+    throw new NotAuthError('Необходима авторизация');
   }
 
   let payload;
@@ -13,10 +13,10 @@ module.exports = (req, res, next) => {
   try {
     payload = verifyToken(authorization);
   } catch (err) {
-    next(new NotAuthError('Необходима авторизация'));
+    throw new NotAuthError('Необходима авторизация');
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
 
-  return next(); // пропускаем запрос дальше
+  next(); // пропускаем запрос дальше
 };
