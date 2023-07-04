@@ -10,7 +10,7 @@ const getCards = (req, res, next) => Card.find({}).populate(['likes', 'owner'])
 
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
-  const owner = req.user;
+  const owner = req.user.id;
   Card.create({ name, link, owner })
     .then((newCard) => res.status(httpConstants.HTTP_STATUS_CREATED).send(newCard))
     .catch((err) => {
@@ -43,17 +43,16 @@ const deleteCardById = (req, res, next) => {
     .catch(next);
 };
 const putLikesCardById = (req, res, next) => {
-  const { id } = req.params;
   Card.findByIdAndUpdate(
-    id,
-    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+    req.params.id,
+    { $addToSet: { likes: req.params.id } }, // добавить _id в массив, если его там нет
     { new: true },
-  ).populate(['likes', 'owner']) // не совсем понимаю как это работает
+  ).populate(['likes', 'owner'])
     .orFail(new Error('NotValidId'))
     .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        throw new NotFoundError('Карточка с указаным id не  найдена');
+        throw new NotFoundError(`Карточка с id ${req.params.id} не  найдена`);
       }
       if (err.name === 'CastError') {
         throw new BadRequestError(
@@ -69,14 +68,14 @@ const deleteLikesCardById = (req, res, next) => {
   const { id } = req.params;
   Card.findByIdAndUpdate(
     id,
-    { $pull: { likes: req.user._id } }, // убрать _id из массива
+    { $pull: { likes: req.user.id } }, // убрать _id из массива
     { new: true },
   ).populate(['likes', 'owner'])
     .orFail(new Error('NotValidId'))
     .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        throw new NotFoundError('Карточка с указаным id не найдена');
+        throw new NotFoundError(`Карточка с id ${req.params.id} не найдена`);
       }
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные для удаления лайка');

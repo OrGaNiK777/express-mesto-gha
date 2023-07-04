@@ -115,7 +115,7 @@ const patchUserById = (req, res, next) => {
 
 const patchAvatarById = (req, res, next) => {
   const newUser = req.body;
-  const id = req.user._id;
+  const { id } = req.user;
   return User.findByIdAndUpdate(id, newUser, {
     new: true,
     runValidators: true,
