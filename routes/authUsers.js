@@ -1,5 +1,5 @@
 const router = require('express').Router();
-
+const validator = require('validator');
 const { celebrate, Joi, errors } = require('celebrate');
 
 const {
@@ -13,7 +13,14 @@ router.post('/signup', celebrate({
     password: Joi.string().required().min(8).trim(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string(),
+    avatar: Joi.string().custom(
+      (value) => {
+        if (validator.isURL(value)) {
+          return value;
+        }
+        throw new Error('Ссылка некорректна');
+      },
+    ),
   }),
 }), createUser);
 

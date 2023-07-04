@@ -65,10 +65,7 @@ const createUser = (req, res, next) => {
         .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send({
           _id: user._id,
           email: user.email,
-        }))
-        .catch((err) => {
-          next(err);
-        });
+        }));
     })
     .catch(next);
 };
