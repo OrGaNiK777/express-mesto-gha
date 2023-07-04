@@ -8,7 +8,6 @@ const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
 const ConflictError = require('../errors/conflict-error');
 const NotAuthError = require('../errors/not-auth-error');
-const ForbiddenError = require('../errors/forbidden-error');
 
 const saltRounds = 10;
 
@@ -63,10 +62,7 @@ const createUser = (req, res, next) => {
         .then((hash) => User.create({
           name, about, avatar, email, password: hash,
         }))
-        .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send({
-          _id: user._id,
-          email: user.email,
-        }))
+        .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send(user))
         .catch((err) => {
           next(err);
         });
@@ -80,7 +76,7 @@ const login = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new ForbiddenError('Пользователь не найден');
+        throw new NotAuthError('Пользователь не найден');
       }
       return bcrypt.compare(password, user.password, (err, result) => {
         if (!result) { throw new NotAuthError('Не верный email или пароль'); }
