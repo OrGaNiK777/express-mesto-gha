@@ -37,11 +37,9 @@ const getUsersById = (req, res, next) => {
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        console.log(err.name);
         throw new BadRequestError('Переданы некорректные данные');
       }
       if (err.message === 'NotValidId') {
-        console.log(err.message);
         throw new NotFoundError(`Пользователь c id: ${req.params.id} не найден`);
       }
       next(err);
@@ -94,7 +92,6 @@ const login = (req, res, next) => {
 const patchUserById = (req, res, next) => {
   const newUser = req.body;
   const { id } = req.user;
-  console.log(id);
   return User.findByIdAndUpdate(id, newUser, {
     new: true,
     runValidators: true,
