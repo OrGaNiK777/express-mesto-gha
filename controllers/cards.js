@@ -3,7 +3,7 @@ const Card = require('../models/card');
 
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
-const ForbiddenError = require('../errors/bad-request-error');
+const ForbiddenError = require('../errors/forbidden-error');
 
 const getCards = (req, res, next) => Card.find({}).populate(['likes', 'owner'])
   .then((cards) => res.status(httpConstants.HTTP_STATUS_OK).send(cards))
@@ -34,13 +34,11 @@ const deleteCardById = (req, res, next) => {
           .orFail(() => new Error('С удалением что-то пошло не так'))
           .then(res.status(httpConstants.HTTP_STATUS_OK).send({ message: 'Карта удалена' }));
       }
-      throw new ForbiddenError('Попытка удалить чужую карточку');
+      throw new ForbiddenError('Вы не можете удалять чужие карточки');
     })
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        throw new NotFoundError(
-          `Карточка с id ${req.params.id} не найдена`,
-        );
+        throw new NotFoundError(`Карточка с id ${req.params.id} не найдена`);
       }
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные для удаления карточки');
