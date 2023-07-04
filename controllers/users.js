@@ -93,7 +93,8 @@ const login = (req, res, next) => {
 
 const patchUserById = (req, res, next) => {
   const newUser = req.body;
-  const id = req.user._id;
+  const { id } = req.user;
+  console.log(id);
   return User.findByIdAndUpdate(id, newUser, {
     new: true,
     runValidators: true,
