@@ -29,7 +29,9 @@ const deleteCardById = (req, res, next) => {
   Card.findById(req.params.id)
     .orFail(new Error('NotValidId'))
     .then((card) => {
-      if (req.card.id === card.owner.toString()) {
+      const userId = req.user._id;
+      const cardOwnerId = card.owner.toString();
+      if (userId === cardOwnerId) {
         card.remove();
         res.status(httpConstants.HTTP_STATUS_OK).send({ message: 'Карта удалена' })
           .catch(next);
