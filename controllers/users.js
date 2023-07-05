@@ -29,9 +29,8 @@ const getUsersById = (req, res, next) => {
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные');
+        next(err);
       }
-      next(err);
     })
     .catch(next);
 };
