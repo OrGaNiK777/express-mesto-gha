@@ -54,7 +54,13 @@ const createUser = (req, res, next) => {
           name: user.name,
           about: user.about,
           avatar: user.avatar,
-        }));
+        }))
+        .catch((err) => {
+          if (err.code === 11000) {
+            next(new ConflictError(`Пользователь с Email ${req.body.email} уже существует`));
+          }
+          next(err);
+        });
     })
     .catch(next);
 };

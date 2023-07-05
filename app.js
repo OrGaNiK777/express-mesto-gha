@@ -4,10 +4,7 @@ const { errors } = require('celebrate');
 
 const routes = require('./routes/index');
 const customErrorsHandler = require('./middlewares/customErrorsHandler');
-
-const host = 'localhost';
-
-const { PORT = 3000 } = process.env;
+const { PORT, host } = require('./utils/consctants');
 
 const app = express();
 
