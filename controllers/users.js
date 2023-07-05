@@ -44,7 +44,7 @@ const createUser = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((emailCheck) => {
       if (emailCheck) {
-        throw new ConflictError('Пользователь уже существует');
+        next(new ConflictError('Пользователь уже существует'));
       }
       bcrypt.hash(password, saltRounds)
         .then((hash) => User.create({
@@ -66,10 +66,10 @@ const login = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new NotAuthError('Пользователь не найден');
+        next(new NotAuthError('Пользователь не найден'));
       }
       return bcrypt.compare(password, user.password, (err, result) => {
-        if (!result) { throw new NotAuthError('Не верный email или пароль'); }
+        if (!result) { next(new NotAuthError('Не верный email или пароль')); }
         const token = generateToken(user._id);
 
         return res.status(httpConstants.HTTP_STATUS_OK).send({ token });
@@ -89,7 +89,7 @@ const patchUserById = (req, res, next) => {
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`);
+        next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`));
       }
       next(err);
     })
@@ -106,10 +106,10 @@ const patchAvatarById = (req, res, next) => {
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (!req.user) {
-        throw new NotFoundError(`Пользователь по id  ${req.user._id} не найден`);
+        next(new NotFoundError(`Пользователь по id  ${req.user._id} не найден`));
       }
       if (err.name === 'ValidationError') {
-        throw new BadRequestError(`${Object.values(err.errors)}`);
+        next(new BadRequestError(`${Object.values(err.errors)}`));
       }
       next(err);
     })

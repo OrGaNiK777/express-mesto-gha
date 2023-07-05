@@ -16,9 +16,9 @@ const createCard = (req, res, next) => {
     .then((newCard) => res.status(httpConstants.HTTP_STATUS_CREATED).send(newCard))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError(
+        next(new BadRequestError(
           `${Object.values(err.errors).map((error) => error.message).join(', ')}`,
-        );
+        ));
       }
       next(err);
     })
@@ -34,11 +34,11 @@ const deleteCardById = (req, res, next) => {
           .orFail(() => new Error('С удалением что-то пошло не так'))
           .then(res.status(httpConstants.HTTP_STATUS_OK).send({ message: 'Карта удалена' }));
       }
-      throw new ForbiddenError('Вы не можете удалять чужие карточки');
+      return next(new ForbiddenError('Вы не можете удалять чужие карточки'));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные для удаления карточки');
+        next(new BadRequestError('Переданы некорректные данные для удаления карточки'));
       }
       next(err);
     })
@@ -55,9 +55,9 @@ const putLikesCardById = (req, res, next) => {
     .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError(
+        next(new BadRequestError(
           'Переданы некорректные данные для постановки лайка',
-        );
+        ));
       }
       next(err);
     })
@@ -75,7 +75,7 @@ const deleteLikesCardById = (req, res, next) => {
     .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные для удаления лайка');
+        next(new BadRequestError('Переданы некорректные данные для удаления лайка'));
       }
       next(err);
     })
