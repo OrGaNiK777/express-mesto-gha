@@ -13,8 +13,8 @@ router.use(cardsRoutes);
 
 router.use(usersRoutes);
 
-router.use('*', (next) => {
-  next(new NotFoundError('Запрашиваемый ресурс не найден'));
-});
+// eslint-disable-next-line max-len
+// router.use('/*', (next) => next(new NotFoundError('Запрашиваемый ресурс не найден'))); / отправкой через next не работает почему то)
+router.use('/*', () => { throw new NotFoundError('Запрашиваемый ресурс не найден'); });
 
 module.exports = router;
