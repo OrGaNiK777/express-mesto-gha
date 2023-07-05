@@ -11,23 +11,15 @@ const NotAuthError = require('../errors/not-auth-error');
 
 const saltRounds = 10;
 
-const getUsers = (req, res, next) => User.find({})
+const getUsers = (res, next) => User.find({})
   .then((user) => res.status(httpConstants.HTTP_STATUS_OK)
-    .send(user)).catch((err) => { throw new Error(err).catch(next); });
+    .send(user)).catch(next);
 
 function getCurrentUser(req, res, next) {
   const { id } = req.user;
   User.findById(id)
+    .orFail(new NotFoundError(`Пользователь c id: ${id} не найден`))
     .then((user) => { res.status(httpConstants.HTTP_STATUS_OK).send(user); })
-    .catch((err) => {
-      if (err.message === 'NotValidId') {
-        throw new NotFoundError(`Пользователь c id: ${id} не найден`);
-      }
-      if (err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные');
-      }
-      next(err);
-    })
     .catch(next);
 }
 
