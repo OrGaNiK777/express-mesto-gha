@@ -40,7 +40,6 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!email || !password) { throw new BadRequestError('Не передан email или пароль'); }
   return User.findOne({ email }).select('+password')
     .then((emailCheck) => {
       if (emailCheck) {
@@ -62,7 +61,6 @@ const createUser = (req, res, next) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  if (!email || !password) { throw new BadRequestError('Не передан email или пароль'); }
   return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
