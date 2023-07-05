@@ -11,7 +11,7 @@ const NotAuthError = require('../errors/not-auth-error');
 
 const saltRounds = 10;
 
-const getUsers = (res, next) => User.find({})
+const getUsers = (req, res, next) => User.find({})
   .then((user) => res.status(httpConstants.HTTP_STATUS_OK)
     .send(user)).catch(next);
 
