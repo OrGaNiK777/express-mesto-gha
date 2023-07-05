@@ -30,8 +30,8 @@ const getUsersById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные'));
-      }
-      next(err);
+      } else
+        next(err);
     })
     .catch(next);
 };
@@ -58,8 +58,8 @@ const createUser = (req, res, next) => {
         .catch((err) => {
           if (err.code === 11000) {
             next(new ConflictError(`Пользователь с Email ${req.body.email} уже существует`));
-          }
-          next(err);
+          } else
+            next(err);
         });
     })
     .catch(next);
@@ -94,8 +94,8 @@ const patchUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`));
-      }
-      next(err);
+      } else
+        next(err);
     })
     .catch(next);
 };
@@ -114,8 +114,8 @@ const patchAvatarById = (req, res, next) => {
       }
       if (err.name === 'ValidationError') {
         next(new BadRequestError(`${Object.values(err.errors)}`));
-      }
-      next(err);
+      } else
+        next(err);
     })
     .catch(next);
 };

@@ -38,12 +38,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     select: false,
-    validate: {
-      validator(password) {
-        return validator.isStrongPassword(password);
-      },
-      message: 'Длина должна быть не менее 8 символов',
-    },
   },
 });
 
