@@ -25,14 +25,11 @@ function getCurrentUser(req, res, next) {
 
 const getUsersById = (req, res, next) => {
   User.findById(req.params.id)
-    .orFail(new Error('NotValidId'))
+    .orFail(new NotFoundError(`Пользователь c id: ${req.params.id} не найден`))
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
-      }
-      if (err.message === 'NotValidId') {
-        throw new NotFoundError(`Пользователь c id: ${req.params.id} не найден`);
       }
       next(err);
     })
@@ -88,12 +85,9 @@ const patchUserById = (req, res, next) => {
     new: true,
     runValidators: true,
   })
-    .orFail(new Error('NotValidId'))
+    .orFail(new NotFoundError(`Пользователь по id  ${req.user._id} не найден`))
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
-      if (err.message === 'NotValidId') {
-        throw new NotFoundError(`Пользователь по id  ${req.user._id} не найден`);
-      }
       if (err.name === 'ValidationError') {
         throw new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`);
       }
