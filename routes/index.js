@@ -13,8 +13,8 @@ router.use(cardsRoutes);
 
 router.use(usersRoutes);
 
-router.use('*', () => {
-  throw new NotFoundError('Запрашиваемый ресурс не найден');
+router.use('*', (next) => {
+  next(new NotFoundError('Запрашиваемый ресурс не найден'));
 });
 
 module.exports = router;
