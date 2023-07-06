@@ -41,10 +41,7 @@ const createUser = (req, res, next) => {
     name, about, avatar, email, password,
   } = req.body;
   return User.findOne({ email }).select('+password')
-    .then((emailCheck) => {
-      if (emailCheck) {
-        return next(new ConflictError('Пользователь  уже существует'));
-      }
+    .then(() => {
       bcrypt.hash(password, saltRounds)
         .then((hash) => User.create({
           name, about, avatar, email, password: hash,
