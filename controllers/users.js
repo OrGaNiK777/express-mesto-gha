@@ -70,7 +70,7 @@ const login = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.name === 'TypeError') {
-        return next(new NotAuthError('Не верный email или пароль'))
+        return next(new NotAuthError('Не верный email или пароль'));
       }
       return next(err);
     });
