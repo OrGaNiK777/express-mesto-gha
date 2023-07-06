@@ -62,17 +62,12 @@ const createUser = (req, res, next) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findOne({ email }).select('+password')
-    .then((user) => {
-      if (!user) {
-        return next(new NotAuthError('Пользователь не найден'));
-      }
-      return bcrypt.compare(password, user.password, (err, result) => {
-        if (!result) { next(new NotAuthError('Не верный email или пароль')); }
-        const token = generateToken(user._id);
+    .then((user) => bcrypt.compare(password, user.password, (err, result) => {
+      if (!result) { next(new NotAuthError('Не верный email или пароль')); }
+      const token = generateToken(user._id);
 
-        return res.status(httpConstants.HTTP_STATUS_OK).send({ token });
-      });
-    })
+      return res.status(httpConstants.HTTP_STATUS_OK).send({ token });
+    }))
     .catch(next);
 };
 
@@ -90,8 +85,7 @@ const patchUserById = (req, res, next) => {
         return next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`));
       }
       return next(err);
-    })
-    .catch(next);
+    });
 };
 
 const patchAvatarById = (req, res, next) => {
@@ -103,9 +97,6 @@ const patchAvatarById = (req, res, next) => {
   })
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
-      if (!req.user) {
-        return next(new NotFoundError(`Пользователь по id  ${req.user._id} не найден`));
-      }
       if (err.name === 'ValidationError') {
         return next(new BadRequestError(`${Object.values(err.errors)}`));
       }
