@@ -68,7 +68,12 @@ const login = (req, res, next) => {
 
       return res.status(httpConstants.HTTP_STATUS_OK).send({ token });
     }))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'TypeError') {
+        return next(new NotAuthError('Не верный email или пароль'))
+      }
+      return next(err);
+    });
 };
 
 const patchUserById = (req, res, next) => {
