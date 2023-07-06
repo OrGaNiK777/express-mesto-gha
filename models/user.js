@@ -2,6 +2,23 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    index: true,
+    unique: true,
+    required: true,
+    validate: {
+      validator(email) {
+        return validator.isEmail(email);
+      },
+      message: 'Email некорректный',
+    },
+  },
+  password: {
+    type: String,
+    required: true,
+    select: false,
+  },
   name: {
     type: String,
     default: 'Жак-Ив Кусто',
@@ -23,21 +40,6 @@ const userSchema = new mongoose.Schema({
       },
       message: 'Ссылка некорректна',
     },
-  },
-  email: {
-    type: String,
-    required: true,
-    validate: {
-      validator(email) {
-        return validator.isEmail(email);
-      },
-      message: 'Email некорректный',
-    },
-  },
-  password: {
-    type: String,
-    required: true,
-    select: false,
   },
 });
 

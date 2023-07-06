@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const jwtSecret = 'p@ssw0rd';
+const { jwtSecret } = require('./consctants');
 
 const generateToken = (id) => jwt.sign({ id }, jwtSecret, { expiresIn: '7d' });
 

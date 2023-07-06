@@ -9,7 +9,7 @@ const BadRequestError = require('../errors/bad-request-error');
 const ConflictError = require('../errors/conflict-error');
 const NotAuthError = require('../errors/not-auth-error');
 
-const saltRounds = 10;
+const { saltRounds } = require('../utils/consctants');
 
 const getUsers = (req, res, next) => User.find({})
   .then((user) => res.status(httpConstants.HTTP_STATUS_OK)
@@ -40,24 +40,21 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  return User.findOne({ email }).select('+password')
-    .then(() => {
-      bcrypt.hash(password, saltRounds)
-        .then((hash) => User.create({
-          name, about, avatar, email, password: hash,
-        }))
-        .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send({
-          email: user.email,
-          name: user.name,
-          about: user.about,
-          avatar: user.avatar,
-        }))
-        .catch((err) => {
-          if (err.code === 11000) {
-            return next(new ConflictError(`Пользователь с Email ${req.body.email} уже существует`));
-          }
-          return next(err);
-        });
+  bcrypt.hash(password, saltRounds)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send({
+      email: user.email,
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+    }))
+    .catch((err) => {
+      if (err.name === 'MongoServerError' && err.code === 11000) {
+        return next(new ConflictError(`Пользователь с Email ${req.body.email} уже существует`));
+      }
+      return next(err);
     })
     .catch(next);
 };
