@@ -16,7 +16,7 @@ const createCard = (req, res, next) => {
     .then((newCard) => res.status(httpConstants.HTTP_STATUS_CREATED).send(newCard))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError(
+        return next(new BadRequestError(
           `${Object.values(err.errors).map((error) => error.message).join(', ')}`,
         ));
       } else
@@ -38,9 +38,9 @@ const deleteCardById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные для удаления карточки'));
-      } else
-        next(err);
+        return next(new BadRequestError('Переданы некорректные данные для удаления карточки'));
+      }
+      next(err);
     })
     .catch(next);
 };
@@ -55,11 +55,11 @@ const putLikesCardById = (req, res, next) => {
     .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError(
+        return next(new BadRequestError(
           'Переданы некорректные данные для постановки лайка',
         ));
-      } else
-        next(err);
+      }
+      next(err);
     })
     .catch(next);
 };
@@ -75,9 +75,9 @@ const deleteLikesCardById = (req, res, next) => {
     .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные для удаления лайка'));
-      } else
-        next(err);
+        return next(new BadRequestError('Переданы некорректные данные для удаления лайка'));
+      }
+      next(err);
     })
     .catch(next);
 };

@@ -29,9 +29,9 @@ const getUsersById = (req, res, next) => {
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные'));
-      } else
-        next(err);
+        return next(new BadRequestError('Переданы некорректные данные'));
+      }
+      next(err);
     })
     .catch(next);
 };
@@ -43,7 +43,7 @@ const createUser = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((emailCheck) => {
       if (emailCheck) {
-        next(new ConflictError('Пользователь уже существует'));
+        return next(new ConflictError('Пользователь уже существует'));
       }
       bcrypt.hash(password, saltRounds)
         .then((hash) => User.create({
@@ -57,9 +57,9 @@ const createUser = (req, res, next) => {
         }))
         .catch((err) => {
           if (err.code === 11000) {
-            next(new ConflictError(`Пользователь с Email ${req.body.email} уже существует`));
-          } else
-            next(err);
+            return next(new ConflictError(`Пользователь с Email ${req.body.email} уже существует`));
+          }
+          next(err);
         });
     })
     .catch(next);
@@ -70,7 +70,7 @@ const login = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        next(new NotAuthError('Пользователь не найден'));
+        return next(new NotAuthError('Пользователь не найден'));
       }
       return bcrypt.compare(password, user.password, (err, result) => {
         if (!result) { next(new NotAuthError('Не верный email или пароль')); }
@@ -93,7 +93,7 @@ const patchUserById = (req, res, next) => {
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`));
+        return next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`));
       } else
         next(err);
     })
@@ -110,10 +110,10 @@ const patchAvatarById = (req, res, next) => {
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (!req.user) {
-        next(new NotFoundError(`Пользователь по id  ${req.user._id} не найден`));
+        return next(new NotFoundError(`Пользователь по id  ${req.user._id} не найден`));
       }
       if (err.name === 'ValidationError') {
-        next(new BadRequestError(`${Object.values(err.errors)}`));
+        return next(new BadRequestError(`${Object.values(err.errors)}`));
       } else
         next(err);
     })
