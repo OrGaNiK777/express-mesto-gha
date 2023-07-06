@@ -40,34 +40,44 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  bcrypt.hash(password, saltRounds)
-    .then((hash) => User.create({
-      name, about, avatar, email, password: hash,
-    }))
-    .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send({
-      email: user.email,
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-    }))
-    .catch((err) => {
-      if (err.code === 11000) {
-        return next(new ConflictError(`Пользователь с Email ${req.body.email} уже существует`));
+  return User.findOne({ email }).select('+password')
+    .then((emailCheck) => {
+      if (emailCheck) {
+        return next(new ConflictError('Пользователь  уже существует'));
       }
-      return next(err);
+      bcrypt.hash(password, saltRounds)
+        .then((hash) => User.create({
+          name, about, avatar, email, password: hash,
+        }))
+        .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send({
+          email: user.email,
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+        }))
+        .catch((err) => {
+          if (err.code === 11000) {
+            return next(new ConflictError(`Пользователь с Email ${req.body.email} уже существует`));
+          }
+          return next(err);
+        });
     })
     .catch(next);
 };
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  return User.findUserByCredentials(email, password).select('+password')
-    .then((user) => bcrypt.compare(password, user.password, () => {
-      const token = generateToken(user._id);
-      res.status(httpConstants.HTTP_STATUS_OK).send({ token });
-    }))
-    .catch(() => {
-      next(new NotAuthError('Не верный email или пароль'));
+  return User.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) {
+        return next(new NotAuthError('Пользователь не найден'));
+      }
+      return bcrypt.compare(password, user.password, (err, result) => {
+        if (!result) { next(new NotAuthError('Не верный email или пароль')); }
+        const token = generateToken(user._id);
+
+        return res.status(httpConstants.HTTP_STATUS_OK).send({ token });
+      });
     })
     .catch(next);
 };
