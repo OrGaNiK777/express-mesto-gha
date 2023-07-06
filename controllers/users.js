@@ -61,16 +61,15 @@ const createUser = (req, res, next) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  return User.findUserByCredentials(email, password)
-    .then((user) => {
-      bcrypt.compare(password, user.password, (err, result) => {
-        if (!result) { next(new NotAuthError('Не верный email или пароль')); }
-        const token = generateToken(user._id);
-        return res.status(httpConstants.HTTP_STATUS_OK).send({ token });
-      })
-
-        .catch(next);
-    });
+  return User.findUserByCredentials(email, password).select('+password')
+    .then((user) => bcrypt.compare(password, user.password, () => {
+      const token = generateToken(user._id);
+      res.status(httpConstants.HTTP_STATUS_OK).send({ token });
+    }))
+    .catch(() => {
+      next(new NotAuthError('Не верный email или пароль'));
+    })
+    .catch(next);
 };
 
 const patchUserById = (req, res, next) => {
