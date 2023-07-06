@@ -31,7 +31,7 @@ const getUsersById = (req, res, next) => {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
-      next(err);
+      return next(err);
     })
     .catch(next);
 };
@@ -43,7 +43,7 @@ const createUser = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((emailCheck) => {
       if (emailCheck) {
-        return next(new ConflictError('Пользователь уже существует'));
+        return next(new ConflictError('Пользователь  уже существует'));
       }
       bcrypt.hash(password, saltRounds)
         .then((hash) => User.create({
@@ -59,7 +59,7 @@ const createUser = (req, res, next) => {
           if (err.code === 11000) {
             return next(new ConflictError(`Пользователь с Email ${req.body.email} уже существует`));
           }
-          next(err);
+          return next(err);
         });
     })
     .catch(next);
@@ -95,7 +95,7 @@ const patchUserById = (req, res, next) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`));
       }
-      next(err);
+      return next(err);
     })
     .catch(next);
 };
@@ -115,7 +115,7 @@ const patchAvatarById = (req, res, next) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError(`${Object.values(err.errors)}`));
       }
-      next(err);
+      return next(err);
     })
     .catch(next);
 };
