@@ -19,8 +19,8 @@ const createCard = (req, res, next) => {
         return next(new BadRequestError(
           `${Object.values(err.errors).map((error) => error.message).join(', ')}`,
         ));
-      } else
-        next(err);
+      }
+      next(err);
     })
     .catch(next);
 };

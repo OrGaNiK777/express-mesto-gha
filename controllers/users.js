@@ -94,8 +94,8 @@ const patchUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`));
-      } else
-        next(err);
+      }
+      next(err);
     })
     .catch(next);
 };
@@ -114,8 +114,8 @@ const patchAvatarById = (req, res, next) => {
       }
       if (err.name === 'ValidationError') {
         return next(new BadRequestError(`${Object.values(err.errors)}`));
-      } else
-        next(err);
+      }
+      next(err);
     })
     .catch(next);
 };
