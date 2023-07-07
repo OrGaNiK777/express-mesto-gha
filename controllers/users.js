@@ -65,12 +65,12 @@ const login = (req, res, next) => {
         return next(new NotAuthError('Пользователь не найден'));
       }
       return bcrypt.compare(password, user.password, (err, result) => {
-        if (!result) { next(new NotAuthError('Не верный email или пароль')); }
-        const token = generateToken(user._id);
-        return res.status(httpConstants.HTTP_STATUS_OK).send({ token });
+        if (!result) { next(new NotAuthError('Не верный email или пароль')); } else {
+          const token = generateToken(user._id);
+          res.status(httpConstants.HTTP_STATUS_OK).send({ token });
+        }
       });
-    })
-    .catch(next);
+    });
 };
 
 const patchUserById = (req, res, next) => {
