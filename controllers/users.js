@@ -32,8 +32,7 @@ const getUsersById = (req, res, next) => {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
       return next(err);
-    })
-    .catch(next);
+    });
 };
 
 const createUser = (req, res, next) => {
@@ -55,8 +54,7 @@ const createUser = (req, res, next) => {
         return next(new ConflictError(`Пользователь с Email ${req.body.email} уже существует`));
       }
       return next(err);
-    })
-    .catch(next);
+    });
 };
 
 const login = (req, res, next) => {
@@ -106,8 +104,7 @@ const patchAvatarById = (req, res, next) => {
         return next(new BadRequestError(`${Object.values(err.errors)}`));
       }
       return next(err);
-    })
-    .catch(next);
+    });
 };
 
 module.exports = {

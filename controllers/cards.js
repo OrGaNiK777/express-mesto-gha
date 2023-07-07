@@ -21,8 +21,7 @@ const createCard = (req, res, next) => {
         ));
       }
       return next(err);
-    })
-    .catch(next);
+    });
 };
 
 const deleteCardById = (req, res, next) => {
@@ -31,7 +30,6 @@ const deleteCardById = (req, res, next) => {
     .then((card) => {
       if (card.owner.toString() === req.user.id) {
         return Card.deleteOne(card._id)
-          .orFail(() => new Error('С удалением что-то пошло не так'))
           .then(res.status(httpConstants.HTTP_STATUS_OK).send({ message: 'Карта удалена' }));
       }
       return next(new ForbiddenError('Вы не можете удалять чужие карточки'));
@@ -41,8 +39,7 @@ const deleteCardById = (req, res, next) => {
         return next(new BadRequestError('Переданы некорректные данные для удаления карточки'));
       }
       return next(err);
-    })
-    .catch(next);
+    });
 };
 
 const putLikesCardById = (req, res, next) => {
@@ -60,8 +57,7 @@ const putLikesCardById = (req, res, next) => {
         ));
       }
       return next(err);
-    })
-    .catch(next);
+    });
 };
 
 const deleteLikesCardById = (req, res, next) => {
@@ -78,8 +74,7 @@ const deleteLikesCardById = (req, res, next) => {
         return next(new BadRequestError('Переданы некорректные данные для удаления лайка'));
       }
       return next(err);
-    })
-    .catch(next);
+    });
 };
 module.exports = {
   getCards,
