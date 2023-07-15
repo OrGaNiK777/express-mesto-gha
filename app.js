@@ -22,7 +22,7 @@ mongoose
 
 app.use(express.json());
 
-app.use(routes);
+app.use('/api', require('./routes'));
 
 app.use(errors());
 
