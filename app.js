@@ -8,7 +8,7 @@ const { PORT, host } = require('./utils/consctants');
 
 const app = express();
 
-app.use(express.static('build'));
+app.use(express.static('../frontend/build'));
 
 mongoose
   .connect(`mongodb://${host}:27017/MestoDB`, {
