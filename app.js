@@ -11,7 +11,7 @@ const app = express();
 app.use(express.static('build'));
 
 mongoose
-  .connect('mongodb://localhost:27017/MestoDB', {
+  .connect(`mongodb://${host}:27017/MestoDB`, {
     useNewUrlParser: true,
     family: 4,
   })
