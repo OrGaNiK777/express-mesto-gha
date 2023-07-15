@@ -9,7 +9,7 @@ const BadRequestError = require('../errors/bad-request-error');
 const ConflictError = require('../errors/conflict-error');
 const NotAuthError = require('../errors/not-auth-error');
 
-const saltRounds = 10;
+const { saltRounds } = require('../utils/consctants');
 
 const getUsers = (req, res, next) => User.find({})
   .then((user) => res.status(httpConstants.HTTP_STATUS_OK)
@@ -29,40 +29,32 @@ const getUsersById = (req, res, next) => {
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные'));
+        return next(new BadRequestError('Переданы некорректные данные'));
       }
-      next(err);
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  return User.findOne({ email }).select('+password')
-    .then((emailCheck) => {
-      if (emailCheck) {
-        next(new ConflictError('Пользователь уже существует'));
+  bcrypt.hash(password, saltRounds)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send({
+      email: user.email,
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+    }))
+    .catch((err) => {
+      if (err.name === 'MongoServerError' && err.code === 11000) {
+        return next(new ConflictError(`Пользователь с Email ${req.body.email} уже существует`));
       }
-      bcrypt.hash(password, saltRounds)
-        .then((hash) => User.create({
-          name, about, avatar, email, password: hash,
-        }))
-        .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send({
-          email: user.email,
-          name: user.name,
-          about: user.about,
-          avatar: user.avatar,
-        }))
-        .catch((err) => {
-          if (err.code === 11000) {
-            next(new ConflictError(`Пользователь с Email ${req.body.email} уже существует`));
-          }
-          next(err);
-        });
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 const login = (req, res, next) => {
@@ -70,16 +62,15 @@ const login = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        next(new NotAuthError('Пользователь не найден'));
+        return next(new NotAuthError('Пользователь не найден'));
       }
       return bcrypt.compare(password, user.password, (err, result) => {
-        if (!result) { next(new NotAuthError('Не верный email или пароль')); }
-        const token = generateToken(user._id);
-
-        return res.status(httpConstants.HTTP_STATUS_OK).send({ token });
+        if (!result) { next(new NotAuthError('Не верный email или пароль')); } else {
+          const token = generateToken(user._id);
+          res.status(httpConstants.HTTP_STATUS_OK).send({ token });
+        }
       });
-    })
-    .catch(next);
+    });
 };
 
 const patchUserById = (req, res, next) => {
@@ -93,11 +84,10 @@ const patchUserById = (req, res, next) => {
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`));
+        return next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(' and ')}`));
       }
-      next(err);
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 const patchAvatarById = (req, res, next) => {
@@ -109,15 +99,11 @@ const patchAvatarById = (req, res, next) => {
   })
     .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
     .catch((err) => {
-      if (!req.user) {
-        next(new NotFoundError(`Пользователь по id  ${req.user._id} не найден`));
-      }
       if (err.name === 'ValidationError') {
-        next(new BadRequestError(`${Object.values(err.errors)}`));
+        return next(new BadRequestError(`${Object.values(err.errors)}`));
       }
-      next(err);
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 module.exports = {

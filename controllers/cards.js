@@ -16,13 +16,12 @@ const createCard = (req, res, next) => {
     .then((newCard) => res.status(httpConstants.HTTP_STATUS_CREATED).send(newCard))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError(
+        return next(new BadRequestError(
           `${Object.values(err.errors).map((error) => error.message).join(', ')}`,
         ));
       }
-      next(err);
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 const deleteCardById = (req, res, next) => {
@@ -31,18 +30,16 @@ const deleteCardById = (req, res, next) => {
     .then((card) => {
       if (card.owner.toString() === req.user.id) {
         return Card.deleteOne(card._id)
-          .orFail(() => new Error('С удалением что-то пошло не так'))
           .then(res.status(httpConstants.HTTP_STATUS_OK).send({ message: 'Карта удалена' }));
       }
       return next(new ForbiddenError('Вы не можете удалять чужие карточки'));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные для удаления карточки'));
+        return next(new BadRequestError('Переданы некорректные данные для удаления карточки'));
       }
-      next(err);
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 const putLikesCardById = (req, res, next) => {
@@ -55,13 +52,12 @@ const putLikesCardById = (req, res, next) => {
     .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError(
+        return next(new BadRequestError(
           'Переданы некорректные данные для постановки лайка',
         ));
       }
-      next(err);
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 const deleteLikesCardById = (req, res, next) => {
@@ -75,11 +71,10 @@ const deleteLikesCardById = (req, res, next) => {
     .then((card) => res.status(httpConstants.HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные для удаления лайка'));
+        return next(new BadRequestError('Переданы некорректные данные для удаления лайка'));
       }
-      next(err);
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 module.exports = {
   getCards,

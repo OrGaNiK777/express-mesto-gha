@@ -2,4 +2,10 @@ const host = 'localhost';
 
 const { PORT = 5000 } = process.env;
 
-module.exports = { host, PORT };
+const saltRounds = 10;
+
+const jwtSecret = 'p@ssw0rd';
+
+module.exports = {
+  host, PORT, saltRounds, jwtSecret,
+};
